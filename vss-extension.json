@@ -1,0 +1,90 @@
+{
+    "manifestVersion": 1,
+    "version": "0.0.1",
+    "name": "Markdown",
+    "scopes": [
+        "vso.work",
+        "vso.work_write"
+    ],
+    "description": "Quickly decompose work item into sub-hierarchies",
+    "publisher": "cschleiden",
+    "id": "markdown",
+    "icons": {
+        "default": "marketplace/logo.png"
+    },
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services.Cloud"
+        }
+    ],
+    "tags": [
+        "Work Items",
+        "Decompose"
+    ],
+    "content": {
+        "details": {
+            "path": "marketplace/details.md"
+        }
+    },
+    "links": {
+        "support": {
+            "uri": "mailto:christopher.schleiden@microsoft.com"
+        }
+    },
+    "branding": {
+        "color": "rgb(220, 235, 252)",
+        "theme": "light"
+    },
+    "categories": [
+        "Plan and track"
+    ],
+    "contributions": [
+        {
+            "id": "markdown-control",
+            "type": "ms.vss-work-web.work-item-form-control",
+            "description": "Markdown",
+            "targets": [
+                "ms.vss-work-web.work-item-form"
+            ],
+            "properties": {
+                "name": "Markdown",
+                "uri": "src/index.html",
+                "height": 90,
+                "inputs": [
+                    {
+                        "id": "FieldName",
+                        "description": "The field associated with the control.",
+                        "type": "WorkItemField",
+                        "properties": {
+                            "workItemFieldTypes": [
+                                "HTML"
+                            ]
+                        },
+                        "validation": {
+                            "dataType": "String",
+                            "isRequired": true
+                        }
+                    },
+                    {
+                        "id": "legacy",
+                        "description": "Block legacy editing",
+                        "type": "Boolean",
+                        "name": "Legacy3",
+                        "validation": {
+                            "dataType": "Boolean",
+                            "isRequired": true
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "addItemsDialog",
+            "type": "ms.vss-web.control",
+            "targets": [],
+            "properties": {
+                "uri": "src/dialog.html"
+            }
+        }
+    ]
+}

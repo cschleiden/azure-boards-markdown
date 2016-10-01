@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {        
+        "module": "amd",
+        "sourceMap": false,
+        "target": "es5",
+        "jsx": "react"
+    },   
+    "filesGlob": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "typings/index.d.ts"
+    ]    
+}
