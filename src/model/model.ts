@@ -29,6 +29,11 @@ export class Model {
     public showMessage: boolean = false;
 
     public switchToEdit() {
+        if (this.showMessage || !this.showPreview) {
+            // Already editing
+            return;
+        }
+
         if (this.mode !== Mode.Markdown) {
             this.showMessage = true;
         } else {

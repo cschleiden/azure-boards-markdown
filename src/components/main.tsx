@@ -9,6 +9,9 @@ import { Model, Mode, ConflictResolution } from "../model/model";
 
 export interface IMainProps extends React.Props<void> {
     model: Model;
+
+    onSave: Function;
+    onSizeChange: (grow: boolean) => void;
 }
 
 export interface IMainState {
@@ -40,12 +43,20 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             }
         }
 
-        return <div className="md">
+        return <div className="md" onKeyUp={this._onKeyUp}>
             {showToolbar ? <div className="toolbar">
-                <span className="bowtie-icon bowtie-edit" onClick={this._toggleToolbar}></span>
+                <span className="bowtie-icon bowtie-edit-outline" title="Edit" onClick={this._toggleToolbar}></span>
+                <span className="bowtie-icon bowtie-arrow-up" title="Shrink" onClick={this._shrink}></span>
+                <span className="bowtie-icon bowtie-arrow-down" title="Expand" onClick={this._expand}></span>
             </div> : null}
             {content}
         </div>;
+    }
+
+    private _onKeyUp = (event: React.KeyboardEvent) => {
+        if (event.ctrlKey && event.key === "s") {
+            this.props.onSave();
+        }
     }
 
     private _messageCancel = () => {
@@ -65,4 +76,12 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
 
         this.forceUpdate();
     };
+
+    private _expand = () => {
+        this.props.onSizeChange(true);
+    }
+
+    private _shrink = () => {
+        this.props.onSizeChange(false);
+    }
 }

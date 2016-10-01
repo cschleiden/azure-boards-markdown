@@ -49,7 +49,7 @@
             "properties": {
                 "name": "Markdown",
                 "uri": "src/index.html",
-                "height": 90,
+                "height": 150,
                 "inputs": [
                     {
                         "id": "FieldName",
@@ -66,10 +66,10 @@
                         }
                     },
                     {
-                        "id": "legacy",
+                        "id": "BlockLegacy",
                         "description": "Block legacy editing",
                         "type": "Boolean",
-                        "name": "Legacy3",
+                        "name": "Block legacy HTML controls from editing",
                         "validation": {
                             "dataType": "Boolean",
                             "isRequired": true

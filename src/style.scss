@@ -9,9 +9,16 @@ html, body, #content {
     border: 1px solid #e6e6e6;
 
     .toolbar {
+        opacity: 0;
+        transition: opacity linear 0.3s;
+        
+        &:hover {
+            opacity: 1;
+        }
+
         cursor: pointer;
 
-        width: 20px;
+        width: 3 * 16x;
         height: 20px;
 
         position: absolute;
@@ -21,6 +28,10 @@ html, body, #content {
         z-index: 1000;
 
         text-align: center;
+
+        span:hover {
+            font-weight: bold;
+        }
     }
 }
 
