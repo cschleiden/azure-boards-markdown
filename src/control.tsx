@@ -15,6 +15,7 @@ export class Control {
     private _witService: WitService.IWorkItemFormService;
 
     private _model: Model = new Model();
+    private _ignoreIncomingChange = false;
 
     constructor() {
         // Cache service instance
@@ -23,30 +24,53 @@ export class Control {
             this._updateFromWorkItem();
         })
 
-        this._model.addListener(() => this._onModelChange());
+        this._model.addDataListener(() => this._onModelChange());
 
         this._render();
     }
 
+    public dispose() {
+        let element = document.getElementById("content");
+        ReactDOM.unmountComponentAtNode(element);
+    }
+
+    /** Triggered when a change is triggered by the editor */
     private _onModelChange() {
         if (this._witService) {
-            this._witService.setFieldValue(this.getFieldName(), this._model.getOutput());
+            this._ignoreIncomingChange = true;
+
+            this._witService.setFieldValue(this.getFieldName(), this._model.getOutput()).then(() => {
+                this._ignoreIncomingChange = false;
+            })
         }
     }
 
-    public update(value: string) {
+    /** Triggered when work item is saved */
+    public onSaved() {
+        this._updateFromWorkItem();
+    }
 
+    /** Triggered when work item is refreshed or reset */
+    public onReset() {
+        this._updateFromWorkItem();
+    }
+
+    /** Triggered when field value on work item changes */
+    public onFieldChange(value: string, lifeCycleEvent?: boolean) {
+        if (!this._ignoreIncomingChange) {
+            this._model.setInput(value, lifeCycleEvent);
+        }
+    }
+
+    /** Get value from work item and update editor */
+    private _updateFromWorkItem() {
+        this._witService.getFieldValue(this.getFieldName()).then(value => {
+            this.onFieldChange(value as string, true);
+        });
     }
 
     public getFieldName(): string {
         return "System.Description";
-    }
-
-    private _updateFromWorkItem() {
-        this._witService.getFieldValue(this.getFieldName()).then(value => {
-            this._model.setInput(value as string);
-            this._render();
-        });
     }
 
     private _render() {

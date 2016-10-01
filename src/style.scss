@@ -46,3 +46,32 @@ html, body, #content {
         outline: none;
     }
 }
+
+.message {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+
+    padding: 10px;
+
+    background: #F8A800;
+
+    * {
+        margin: 0;
+    }
+
+    .close {
+        position: absolute;
+        top: 10px; right: 10px;
+
+        cursor: pointer;
+
+        &:hover span {
+            font-weight: bold;
+        }    
+    }
+
+    .buttons {
+        margin-top: 10px;
+        text-align: right;
+    }
+}

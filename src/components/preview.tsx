@@ -6,7 +6,7 @@ import * as ReactDOM from "react-dom";
 
 import * as Frame from "react-frame-component";
 
-import { Model } from "../model/model";
+import { Model, sharedStyles } from "../model/model";
 
 export interface IPreviewProps {
     model: Model;
@@ -15,7 +15,7 @@ export interface IPreviewProps {
 export class LegacyPreviewComponent extends React.Component<IPreviewProps, void> {
     public render(): JSX.Element {
         return <div className="preview">
-            <Frame head={<style type="text/css">{inlineStyles}</style>}>
+            <Frame head={<style type="text/css">{inlineStyles + sharedStyles}</style>}>
                 <div dangerouslySetInnerHTML={{ __html: this.props.model.htmlContent }} />
             </Frame>
         </div>;

@@ -42,7 +42,18 @@ describe("Utils", () => {
         });
     });
 
-    let check = (input, output) => {
+    describe("roundtrips html", () => {
+        it("should roundtrip code", () => {
+            let input = "`code`";
+            let html = Utils.renderMarkdown(input);
+            let markdown = Utils.convertToMarkdown(html);
+            expect(markdown).to.eq(input);
+            console.log(markdown);
+            console.log(html);
+        })
+    });
+
+    const check = (input, output) => {
         const test = Utils.convertToMarkdown(input);
         expect(test).to.equal(output);
     };
