@@ -7,6 +7,7 @@
     "q": "registry:dt/q#0.0.0+20160323171452",
     "react": "registry:dt/react#0.14.0+20160526134601",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
+    "react-dropzone": "registry:dt/react-dropzone#0.0.0+20160830165722",
     "react-spinkit": "registry:dt/react-spinkit#1.1.4+20160316155526",
     "require": "registry:dt/require#2.1.20+20160919185614",
     "tfs": "npm:vss-web-extension-sdk/typings/tfs.d.ts",

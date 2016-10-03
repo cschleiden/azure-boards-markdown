@@ -5,6 +5,7 @@ import * as marked from "marked";
 
 const __md = "__md";
 const __mdStyle = "__mdStyle";
+const __mdBlock = "__mdBlock";
 
 export enum Mode {
     None = 0,
@@ -19,6 +20,7 @@ export enum ConflictResolution {
 }
 
 export const sharedStyles = `code, pre { background:#ededed } pre { padding: 5px; }`;
+const block = `<div id="${__mdBlock}" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1000;background:transparent;cursor:not-allowed;" title="This content was edited using markdown, and is read-only in this editor"></div>`;
 
 export class Model {
     public markdownContent: string;
@@ -27,6 +29,12 @@ export class Model {
 
     public showPreview: boolean = true;
     public showMessage: boolean = false;
+
+    private _block = false;
+
+    public setBlock(block: boolean) {
+        this._block = block;
+    }
 
     public switchToEdit() {
         if (this.showMessage || !this.showPreview) {
@@ -141,7 +149,12 @@ export class Model {
     }
 
     public getOutput(): string {
-        return `<p style="display:none" id="${__md}">${this.markdownContent}</p><style id="${__mdStyle}">${sharedStyles}></style>${this.htmlContent}`;
+        let b: string = "";
+        if (this._block) {
+            b = block;
+        }
+
+        return `<div style="display:none; width: 0; height: 0; overflow: hidden; position: absolute;" id="${__md}">${this.markdownContent}</div><style id="${__mdStyle}">${sharedStyles}></style>${b}${this.htmlContent}`;
     }
 
     private _dataListeners: Function[] = [];
@@ -207,6 +220,7 @@ export namespace Utils {
     export function extractMarkdown(value: string): { markdownContent: string; htmlContent: string; } {
         let parsed = $("<div></div>").html(value);
         parsed.find(`#${__mdStyle}`).remove();
+        parsed.find(`#${__mdBlock}`).remove();
         let mdElement = parsed.find(`#${__md}`);
 
         if (mdElement.length === 0) {

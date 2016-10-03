@@ -10,26 +10,35 @@ import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 import { MainComponent } from "./components/main"
 
 import { Model } from "./model/model";
+import { UploadsService } from "./services/uploads";
 
 export class Control implements ExtensionContracts.IWorkItemNotificationListener {
     private _witService: WitService.IWorkItemFormService;
+    private _uploadsService: UploadsService = new UploadsService();
 
     private _model: Model = new Model();
     private _ignoreIncomingChange = false;
 
     private _height: number;
+    private _fullHeight: number;
     private _fieldName: string;
 
     constructor() {
         const config = VSS.getConfiguration();
         this._fieldName = config.witInputs["FieldName"];
-        this._height = config.defaultHeight;
+        this._height = Number(config.witInputs["height"]) || config.defaultHeight;
+        this._fullHeight = Number(config.witInputs["fullHeight"]) || 500;
 
         this._model.addDataListener(() => this._onModelChange());
+        
+        // TODO
+        this._model.setBlock(false);
     }
 
     public onLoaded() {
         let cont = () => {
+            this._witService.getId().then(id => this._uploadsService.setWorkItemId(id));
+
             this._updateFromWorkItem();
             this._render();
         }
@@ -69,7 +78,8 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
     /** Triggered when work item is saved */
     public onSaved() {
-        this._updateFromWorkItem();
+        this._uploadsService.referenceAttachments();
+        this._updateFromWorkItem();        
     }
 
     public onRefreshed() {
@@ -101,7 +111,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
     private _render() {
         let element = document.getElementById("content");
-        ReactDOM.render(<MainComponent model={this._model} onSave={this._onSave} onSizeChange={this._onSizeChange} />, element);
+        ReactDOM.render(<MainComponent model={this._model} uploads={this._uploadsService} onSave={this._onSave} onSizeChange={this._toggleHeight} />, element);
     }
 
     private _onSave = () => {
@@ -110,15 +120,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
         }
     }
 
-    private _onSizeChange = (grow: boolean) => {
-        const inc = 200;
-
-        if (grow) {
-            this._height = Math.min(1000, this._height + inc);
-        } else {
-            this._height = Math.max(150, this._height - inc);
-        }
-
-        VSS.resize(null, this._height);
+    private _toggleHeight = (full: boolean) => {
+        VSS.resize(null, full ? this._fullHeight : this._height);
     }
 }

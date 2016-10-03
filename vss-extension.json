@@ -1,6 +1,6 @@
 {
     "manifestVersion": 1,
-    "version": "0.0.1",
+    "version": "0.0.9",
     "name": "Markdown",
     "scopes": [
         "vso.work",
@@ -53,6 +53,7 @@
                 "inputs": [
                     {
                         "id": "FieldName",
+                        "name": "HTML field to show Markdown editor for",
                         "description": "The field associated with the control.",
                         "type": "WorkItemField",
                         "properties": {
@@ -67,12 +68,31 @@
                     },
                     {
                         "id": "BlockLegacy",
-                        "description": "Block legacy editing",
-                        "type": "Boolean",
                         "name": "Block legacy HTML controls from editing",
+                        "description": "Block legacy editing",
+                        "mode": "combo",
                         "validation": {
                             "dataType": "Boolean",
+                            "mode": "combo",
                             "isRequired": true
+                        }
+                    },
+                    {
+                        "id": "height",
+                        "name": "Initial height",
+                        "description": "Height of the control on the form (default 150px)",
+                        "validation": {
+                            "dataType": "Number",
+                            "isRequired": false
+                        }
+                    },
+                    {
+                        "id": "fullHeight",
+                        "name": "Full height",
+                        "description": "Height of the control on the form when maximized (default 500px)",
+                        "validation": {
+                            "dataType": "Number",
+                            "isRequired": false
                         }
                     }
                 ]

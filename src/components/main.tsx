@@ -7,21 +7,27 @@ import { LegacyPreviewComponent } from "./preview";
 
 import { Model, Mode, ConflictResolution } from "../model/model";
 
+import { UploadsService } from "../services/uploads";
+
 export interface IMainProps extends React.Props<void> {
     model: Model;
+    uploads: UploadsService;
 
     onSave: Function;
     onSizeChange: (grow: boolean) => void;
 }
 
 export interface IMainState {
+    fullScreen: boolean;
 }
 
 export class MainComponent extends React.Component<IMainProps, IMainState> {
     constructor(props: IMainProps) {
         super(props);
 
-        this.state = {};
+        this.state = {
+            fullScreen: false
+        };
 
         this.props.model.addStateListener(() => {
             this.forceUpdate();
@@ -39,15 +45,14 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             if (this.props.model.showPreview) {
                 content = <LegacyPreviewComponent model={this.props.model} />;
             } else {
-                content = <EditorComponent model={this.props.model} />;
+                content = <EditorComponent model={this.props.model} uploads={this.props.uploads} />;
             }
         }
 
         return <div className="md" onKeyUp={this._onKeyUp}>
             {showToolbar ? <div className="toolbar">
-                <span className="bowtie-icon bowtie-edit-outline" title="Edit" onClick={this._toggleToolbar}></span>
-                <span className="bowtie-icon bowtie-arrow-up" title="Shrink" onClick={this._shrink}></span>
-                <span className="bowtie-icon bowtie-arrow-down" title="Expand" onClick={this._expand}></span>
+                <span className="bowtie-icon bowtie-edit-outline" title="Edit" onClick={this._toggleToolbar}></span>                
+                <span className={ "bowtie-icon " + (this.state.fullScreen ? "bowtie-view-full-screen-exit" : "bowtie-view-full-screen") } title="Full view" onClick={this._toggleView}></span>
             </div> : null}
             {content}
         </div>;
@@ -56,6 +61,7 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
     private _onKeyUp = (event: React.KeyboardEvent) => {
         if (event.ctrlKey && event.key === "s") {
             this.props.onSave();
+            event.preventDefault();
         }
     }
 
@@ -77,11 +83,13 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
         this.forceUpdate();
     };
 
-    private _expand = () => {
-        this.props.onSizeChange(true);
-    }
+    private _toggleView = () => {
+        const newState = !this.state.fullScreen;
 
-    private _shrink = () => {
-        this.props.onSizeChange(false);
+        this.setState({
+            fullScreen: newState
+        });
+
+        this.props.onSizeChange(newState);        
     }
 }

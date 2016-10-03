@@ -45,6 +45,7 @@
   "dependencies": {
     "jquery": "^3.1.1",
     "marked": "^0.3.6",
+    "react-dropzone": "^3.6.0",
     "react-frame-component": "^0.6.6",
     "to-markdown": "^3.0.1",
     "vss-web-extension-sdk": "^1.105.0"
