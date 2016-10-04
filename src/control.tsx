@@ -37,8 +37,6 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
     public onLoaded() {
         let cont = () => {
-            this._witService.getId().then(id => this._uploadsService.setWorkItemId(id));
-
             this._updateFromWorkItem();
             this._render();
         }
@@ -78,7 +76,6 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
     /** Triggered when work item is saved */
     public onSaved() {
-        this._uploadsService.referenceAttachments();
         this._updateFromWorkItem();        
     }
 
