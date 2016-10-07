@@ -19,7 +19,7 @@ export enum ConflictResolution {
     Ignore
 }
 
-export const sharedStyles = `code, pre { background:#ededed } pre { padding: 5px; }`;
+export const sharedStyles = require("raw!../assets/vsts-style.style");
 const block = `<div id="${__mdBlock}" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1000;background:transparent;cursor:not-allowed;" title="This content was edited using markdown, and is read-only in this editor"></div>`;
 
 export class Model {
@@ -88,10 +88,16 @@ export class Model {
         }
 
         const { markdownContent, htmlContent } = Utils.extractMarkdown(rawInput);
-        if (markdownContent) {
+        if (!markdownContent && !htmlContent) {
+            this.mode = Mode.Markdown;
+            this.markdownContent = "";
+            this.htmlContent = "";
+        } else if (markdownContent) {
             const generatedMarkdownContenxt = Utils.renderMarkdown(markdownContent);
 
-            if (htmlContent.trim() !== generatedMarkdownContenxt.trim()) {
+            const trimmedHtmlContent = htmlContent.trim();
+
+            if (trimmedHtmlContent !== "" && trimmedHtmlContent !== generatedMarkdownContenxt.trim()) {
                 // Content was changed in legacy editor
                 this.mode = Mode.MarkdownModified;
             } else {
@@ -154,7 +160,7 @@ export class Model {
             b = block;
         }
 
-        return `<div style="display:none; width: 0; height: 0; overflow: hidden; position: absolute;" id="${__md}">${this.markdownContent}</div><style id="${__mdStyle}">${sharedStyles}></style>${b}${this.htmlContent}`;
+        return `<div style="display:none; width: 0; height: 0; overflow: hidden; position: absolute; font-size: 0;" id="${__md}">${this.markdownContent}</div><style id="${__mdStyle}">${sharedStyles}></style>${b}<div class="rendered-markdown">${this.htmlContent}</div>`;
     }
 
     private _dataListeners: Function[] = [];
@@ -221,20 +227,23 @@ export namespace Utils {
         let parsed = $("<div></div>").html(value);
         parsed.find(`#${__mdStyle}`).remove();
         parsed.find(`#${__mdBlock}`).remove();
+        let inputHtml = parsed.find(`.rendered-markdown`).html();
         let mdElement = parsed.find(`#${__md}`);
 
         if (mdElement.length === 0) {
+            // No hidden md content found
             return {
                 markdownContent: null,
                 htmlContent: value
             };
         } else {
+            // Hiden md content found
             const md = mdElement.text();
             mdElement.remove();
 
             return {
                 markdownContent: md,
-                htmlContent: parsed.html()
+                htmlContent: inputHtml
             };
         }
     }

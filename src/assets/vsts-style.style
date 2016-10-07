@@ -1,0 +1,146 @@
+.rendered-markdown body,.rendered-markdown html {
+    font-family: "-apple-system",BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Ubuntu,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    height: 100%;
+    font-size: 13px;
+    line-height: 20px
+}
+
+.rendered-markdown body {
+    position: relative;
+    padding-top: 50px
+}
+
+.rendered-markdown h1,.rendered-markdown h2,.rendered-markdown h3,.rendered-markdown h4,.rendered-markdown h5,.rendered-markdown h6 {
+    color: #007acc;
+    font-weight: 400
+}
+
+.rendered-markdown h1 {
+    border-bottom: 1px solid #e6e6e6;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 20px
+}
+
+.rendered-markdown h2 {
+    font-size: 18px;
+    border-bottom: 1px solid #e6e6e6;
+    font-weight: 600;
+    color: #303030;
+    margin-bottom: 10px;
+    margin-top: 20px
+}
+
+.rendered-markdown h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px
+}
+
+.rendered-markdown h4 {
+    font-size: 14px;
+    margin-bottom: 10px
+}
+
+.rendered-markdown h5 {
+    font-size: 12px;
+    margin-bottom: 10px
+}
+
+.rendered-markdown h6 {
+    font-size: 12px;
+    font-weight: 300;
+    margin-bottom: 10px
+}
+
+.rendered-markdown.metaitem {
+    font-size: 12px;
+    padding-top: 15px
+}
+
+.rendered-markdown.metavalue {
+    font-size: 12px;
+    padding-left: 4px
+}
+
+.rendered-markdown.metavalue>img {
+    height: 32px;
+    width: 32px;
+    margin-bottom: 3px;
+    padding-left: 1px
+}
+
+.rendered-markdown li.metavaluelink {
+    list-style-type: disc;
+    list-style-position: inside
+}
+
+.rendered-markdown li.metavalue>a {
+    border: none;
+    padding: 0;
+    display: inline
+}
+
+.rendered-markdown li.metavalue>a:hover {
+    background-color: inherit;
+    text-decoration: underline
+}
+
+.rendered-markdown code,.rendered-markdown kbd,.rendered-markdown pre,.rendered-markdown samp {
+    font-family: Monaco,Menlo,Consolas,"Droid Sans Mono","Inconsolata","Courier New",monospace
+}
+
+.rendered-markdown code {
+    color: #333;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 90%;
+    line-height: 2;
+    white-space: nowrap
+}
+
+.rendered-markdown pre {
+    color: #333;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    display: block;
+    padding: 6px;
+    font-size: 13px;
+    word-break: break-all;
+    word-wrap: break-word
+}
+
+.rendered-markdown pre code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: pre-wrap;
+    background-color: transparent;
+    line-height: 1.428571429;
+    border: none
+}
+
+.rendered-markdown.pre-scrollable {
+    max-height: 340px;
+    overflow-y: scroll
+}
+
+.rendered-markdown table {
+    border-collapse: collapse
+}
+
+.rendered-markdown table {
+    width: auto
+}
+
+.rendered-markdown table,.rendered-markdown th,.rendered-markdown td {
+    border: 1px solid #ccc;
+    padding: 4px
+}
+
+.rendered-markdown th {
+    font-weight: bold;
+    background-color: #f8f8f8
+}

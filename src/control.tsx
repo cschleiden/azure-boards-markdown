@@ -118,6 +118,6 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     }
 
     private _toggleHeight = (full: boolean) => {
-        VSS.resize(null, full ? this._fullHeight : this._height);
+        VSS.resize(700, full ? this._fullHeight : this._height);
     }
 }

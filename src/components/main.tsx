@@ -49,19 +49,22 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             }
         }
 
-        return <div className="md" onKeyUp={this._onKeyUp}>
+        return <div>
             {showToolbar ? <div className="toolbar">
-                <span className="bowtie-icon bowtie-edit-outline" title="Edit" onClick={this._toggleToolbar}></span>                
-                <span className={ "bowtie-icon " + (this.state.fullScreen ? "bowtie-view-full-screen-exit" : "bowtie-view-full-screen") } title="Full view" onClick={this._toggleView}></span>
+                <span className="bowtie-icon bowtie-edit-outline" title="Edit" onClick={this._toggleToolbar}></span>
+                <span className={"bowtie-icon " + (this.state.fullScreen ? "bowtie-view-full-screen-exit" : "bowtie-view-full-screen")} title="Full view" onClick={this._toggleView}></span>
             </div> : null}
-            {content}
+            <div className="md" onKeyDown={this._onKeyDown}>
+                {content}
+            </div>
         </div>;
     }
 
-    private _onKeyUp = (event: React.KeyboardEvent) => {
+    private _onKeyDown = (event: React.KeyboardEvent) => {
         if (event.ctrlKey && event.key === "s") {
             this.props.onSave();
             event.preventDefault();
+            return false;
         }
     }
 
@@ -90,6 +93,6 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             fullScreen: newState
         });
 
-        this.props.onSizeChange(newState);        
+        this.props.onSizeChange(newState);
     }
 }
