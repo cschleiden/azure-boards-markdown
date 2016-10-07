@@ -15,7 +15,7 @@ export interface IEditorState {
 }
 
 function getImageToken(name: string, path: string): string {
-    return `![${name}](${path}})`;
+    return `![${name}](${path})`;
 }
 
 export class EditorComponent extends React.Component<IEditorProps, IEditorState> {
@@ -70,5 +70,13 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
             value: event.target.value
         });
         this.props.model.setMarkdown(event.target.value);
+
+
+        if (this._textarea) {
+            this._textarea.style.height = "auto";
+            const scrollHeight = this._textarea.scrollHeight;
+            this._textarea.style.height = "";            
+            this.props.model.setHeight(scrollHeight);
+        }
     };
 }

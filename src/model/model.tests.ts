@@ -48,8 +48,11 @@ describe("Utils", () => {
             let html = Utils.renderMarkdown(input);
             let markdown = Utils.convertToMarkdown(html);
             expect(markdown).to.eq(input);
-            console.log(markdown);
-            console.log(html);
+        })
+
+        it("should roundtrip quotes", () => {
+            let input = `'""'`;
+            expect(Utils.convertToMarkdown(Utils.renderMarkdown(input))).to.eq(input);
         })
     });
 

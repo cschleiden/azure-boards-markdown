@@ -2,7 +2,7 @@ html, body, #content, #content > div {
     height: 100%;
 }
 
-$toolbarHeight: 20px;
+$toolbarHeight: 22px;
 .md {
     width: 100%;
     height: calc(100% - #{$toolbarHeight});
@@ -16,20 +16,27 @@ $toolbarHeight: 20px;
 
 .toolbar {
     opacity: 1;
-    transition: opacity linear 0.3s;
-
-    cursor: pointer;
+    transition: opacity linear 0.3s;    
 
     width: 100%;
     height: $toolbarHeight;
-    
-    background: #e6e6e6; 
+
+    clear: both;
+
+    user-select: none;
+    -moz-user-select: none;
 
     span { 
+        cursor: pointer;
+
         padding: 3px 4px;
 
         &:hover {
             background: #d4e5f5;
+        }
+
+        &.right {
+            float: right;
         }
     }
 }

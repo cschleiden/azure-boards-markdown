@@ -19,18 +19,19 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     private _model: Model = new Model();
     private _ignoreIncomingChange = false;
 
-    private _height: number;
-    private _fullHeight: number;
+    private _minHeight: number;
+    private _maxHeight: number;
     private _fieldName: string;
 
     constructor() {
         const config = VSS.getConfiguration();
         this._fieldName = config.witInputs["FieldName"];
-        this._height = Number(config.witInputs["height"]) || config.defaultHeight;
-        this._fullHeight = Number(config.witInputs["fullHeight"]) || 500;
+        this._minHeight = Number(config.witInputs["height"]) || config.defaultHeight;
+        this._maxHeight = Number(config.witInputs["fullHeight"]) || 500;
 
         this._model.addDataListener(() => this._onModelChange());
-        
+        this._model.addStateListener(() => this._onModelStateChange());
+
         // TODO
         this._model.setBlock(false);
     }
@@ -70,13 +71,18 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
             this._witService.setFieldValue(this.getFieldName(), this._model.getOutput()).then(() => {
                 this._ignoreIncomingChange = false;
-            })
+            });
         }
+    }
+
+    /** Triggered when non-data changes are triggered in editor */
+    private _onModelStateChange() {
+        this._updateSize();
     }
 
     /** Triggered when work item is saved */
     public onSaved() {
-        this._updateFromWorkItem();        
+        this._updateFromWorkItem();
     }
 
     public onRefreshed() {
@@ -93,6 +99,8 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
         if (!this._ignoreIncomingChange) {
             this._model.setInput(value, lifeCycleEvent);
         }
+
+        this._updateSize();
     }
 
     /** Get value from work item and update editor */
@@ -103,12 +111,12 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     }
 
     public getFieldName(): string {
-        return "System.Description";
+        return this._fieldName;
     }
 
     private _render() {
         let element = document.getElementById("content");
-        ReactDOM.render(<MainComponent model={this._model} uploads={this._uploadsService} onSave={this._onSave} onSizeChange={this._toggleHeight} />, element);
+        ReactDOM.render(<MainComponent model={this._model} uploads={this._uploadsService} onSave={this._onSave} />, element);
     }
 
     private _onSave = () => {
@@ -117,7 +125,32 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
         }
     }
 
-    private _toggleHeight = (full: boolean) => {
-        VSS.resize(700, full ? this._fullHeight : this._height);
+    private lastHeight: number = null;
+
+    private _updateSize() {
+        if (!this._model.showMessage) {
+            let newHeight: number;
+
+            if (this._model.autoGrow) {
+                newHeight = this._model.getDesiredHeight();
+
+                if (newHeight === null) {
+                    // Height not yet available, schedule for next tick
+                    setTimeout(() => this._updateSize(), 0);
+                    return;
+                }
+
+                // Clamp
+                newHeight = Math.min(this._maxHeight, Math.max(this._minHeight, newHeight));
+            } else {
+                newHeight = this._minHeight;
+            }
+
+            if (newHeight && newHeight !== this.lastHeight) {
+                VSS.resize(null, newHeight);
+            }
+
+            this.lastHeight = newHeight;
+        }
     }
 }

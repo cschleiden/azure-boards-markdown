@@ -14,11 +14,9 @@ export interface IMainProps extends React.Props<void> {
     uploads: UploadsService;
 
     onSave: Function;
-    onSizeChange: (grow: boolean) => void;
 }
 
 export interface IMainState {
-    fullScreen: boolean;
 }
 
 export class MainComponent extends React.Component<IMainProps, IMainState> {
@@ -26,7 +24,6 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
         super(props);
 
         this.state = {
-            fullScreen: false
         };
 
         this.props.model.addStateListener(() => {
@@ -51,20 +48,28 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
 
         return <div>
             {showToolbar ? <div className="toolbar">
-                <span className="bowtie-icon bowtie-edit-outline" title="Edit" onClick={this._toggleToolbar}></span>
-                <span className={"bowtie-icon " + (this.state.fullScreen ? "bowtie-view-full-screen-exit" : "bowtie-view-full-screen")} title="Full view" onClick={this._toggleView}></span>
+                <span className={"right bowtie-icon " + (this.props.model.autoGrow ? "bowtie-view-full-screen-exit" : "bowtie-view-full-screen")} title="Toggle auto grow" onClick={this._toggleAutoGrow}></span>
+                <span className={"right bowtie-icon " + (this.props.model.showPreview ? "bowtie-edit-outline" : "bowtie-file-preview")} title={(this.props.model.showPreview ? "Preview" : "Edit")} onClick={this._toggleEditMode}></span>
             </div> : null}
-            <div className="md" onKeyDown={this._onKeyDown}>
+            <div className="md" onKeyDown={this._onKeyDown} tabindex="0">
                 {content}
             </div>
         </div>;
     }
 
     private _onKeyDown = (event: React.KeyboardEvent) => {
-        if (event.ctrlKey && event.key === "s") {
-            this.props.onSave();
-            event.preventDefault();
-            return false;
+        if (event.ctrlKey) {
+            if (event.key === "s") {
+                this.props.onSave();
+                event.preventDefault();
+                return false;
+            }
+
+            if (event.shiftKey && event.key.toLowerCase() === "v") {
+                this._toggleEditMode();
+                event.preventDefault();
+                return false;
+            }
         }
     }
 
@@ -76,7 +81,7 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
         this.props.model.resolveConflict(resolution);
     };
 
-    private _toggleToolbar = () => {
+    private _toggleEditMode = () => {
         if (this.props.model.showPreview) {
             this.props.model.switchToEdit();
         } else {
@@ -86,13 +91,7 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
         this.forceUpdate();
     };
 
-    private _toggleView = () => {
-        const newState = !this.state.fullScreen;
-
-        this.setState({
-            fullScreen: newState
-        });
-
-        this.props.onSizeChange(newState);
+    private _toggleAutoGrow = () => {
+        this.props.model.toggleAutoGrow();
     }
 }

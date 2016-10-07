@@ -22,11 +22,14 @@ export enum ConflictResolution {
 export const sharedStyles = require("raw!../assets/vsts-style.style");
 const block = `<div id="${__mdBlock}" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1000;background:transparent;cursor:not-allowed;" title="This content was edited using markdown, and is read-only in this editor"></div>`;
 
+const lineHeightInPx = 20;
+
 export class Model {
     public markdownContent: string;
     public htmlContent: string;
     public mode: Mode = Mode.None;
 
+    public autoGrow: boolean = false;
     public showPreview: boolean = true;
     public showMessage: boolean = false;
 
@@ -55,6 +58,50 @@ export class Model {
         this.showPreview = true;
 
         this._triggerStateChange();
+    }
+
+    public toggleAutoGrow() {
+        this.autoGrow = !this.autoGrow;
+
+        this._triggerStateChange();
+    }
+
+    private _height: number;
+    public setHeight(height: number) {
+        this._height = height;
+
+        this._triggerStateChange();
+    }    
+
+    public getDesiredHeight(): number {
+        return this._height + (this.showPreview ? 45 : 25);
+        /*
+
+        if (this.showPreview) {
+            // TODO: Conceptually this doesn't belong here
+            let $iframe = $("body").find("iframe");
+            if ($iframe && $iframe.length > 0) {
+                let body = ($iframe[0] as HTMLIFrameElement).contentWindow.document.body;
+                if (body) {
+                    return $(body).find(".frame-root").outerHeight(true) + 45;
+                }
+            }
+
+            return null;
+        } else {
+            let ta = $("textarea")[0];
+            if (ta) {
+                ta.style.height = "auto";
+                const scrollHeight = ta.scrollHeight;
+                ta.style.height = "";
+                //ta.style.height = `${scrollHeight}px`;
+                return scrollHeight + 25;
+                //const numberOfLines = this.markdownContent.split(/\r?\n/).length;
+                //return numberOfLines * lineHeightInPx + 25;
+            }
+
+            return null;
+        }*/
     }
 
     public cancelEdit() {
@@ -187,8 +234,14 @@ export class Model {
 }
 
 export namespace Utils {
+    function unescape(html: string): string {
+        return html
+            .replace(/&quot;/g, `"`)
+            .replace(/&#39;/g, `'`);
+    }
+
     export function renderMarkdown(input: string): string {
-        return marked(input, {})
+        return unescape(marked(input, {}));
     }
 
     export function convertToMarkdown(value: string): string {
@@ -243,7 +296,7 @@ export namespace Utils {
 
             return {
                 markdownContent: md,
-                htmlContent: inputHtml
+                htmlContent: unescape(inputHtml)
             };
         }
     }
