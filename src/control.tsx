@@ -13,6 +13,8 @@ import { IWorkItemControlAdapter } from "./adapter";
 
 import { MainComponent } from "./components/main"
 
+import { Uploads } from "./services/uploads"
+
 import { MainStore, IStoreListener } from "./store/store";
 import { ActionsHub, IActionHandler } from "./actions/actions";
 import { ActionsCreator } from "./actions/actionsCreators";
@@ -40,7 +42,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
             this._storeSettings();
         });
 
-        this._actionsCreator = new ActionsCreator(actionsHub, this._store, this);
+        this._actionsCreator = new ActionsCreator(actionsHub, this._store, this, new Uploads());
 
         this._loadSettings();
     }

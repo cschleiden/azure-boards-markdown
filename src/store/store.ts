@@ -35,10 +35,12 @@ export class MainStore extends Store {
 
     private _fieldName: string;
     private _minHeight: number;
-    private _maxHeight: number;
+    private _maxHeight: number;    
 
     private _height: number;
     private _sizeMode: SizeMode = SizeMode.Default;
+
+    private _showProgress: boolean;
 
     private _markdownContent: string;
     private _htmlContent: string;
@@ -64,6 +66,8 @@ export class MainStore extends Store {
         this._triggerSave = triggerSave;
         this._triggerSettings = triggerSettings;
 
+        this._showProgress = false;
+
         this._subscribeToActions();
     }
 
@@ -88,6 +92,10 @@ export class MainStore extends Store {
 
     public getMode(): Mode {
         return this._mode;
+    }
+
+    public getProgress(): boolean {
+        return this._showProgress;
     }
 
     public getHeight(): number {
@@ -127,6 +135,8 @@ export class MainStore extends Store {
         this._actionsHub.setMarkdownContent.addListener(this._onSetMarkdownContent.bind(this));
         this._actionsHub.resolveConflict.addListener(this._onResolveConflict.bind(this));
 
+        this._actionsHub.setProgress.addListener(this._onSetProgress.bind(this));
+
         this._actionsHub.toggleState.addListener(this._onToggleState.bind(this));
         this._actionsHub.toggleSizeMode.addListener(this._onToggleSizeMode.bind(this));
         this._actionsHub.setSizeMode.addListener(this._onSetSizeMode.bind(this));
@@ -134,6 +144,7 @@ export class MainStore extends Store {
         this._actionsHub.reset.addListener(this._onReset.bind(this));
 
         this._actionsHub.changeSelection.addListener(this._onChangeSelection.bind(this));
+        this._actionsHub.insertToken.addListener(this._onInsertToken.bind(this));
     }
 
     private _fireSave = throttle(500, () => {
@@ -197,6 +208,12 @@ export class MainStore extends Store {
         this._mode = Mode.Markdown;
 
         this._fireSave();
+        this._fire();
+    }
+
+    private _onSetProgress(progress: boolean) {
+        this._showProgress = progress;
+
         this._fire();
     }
 
@@ -271,5 +288,15 @@ export class MainStore extends Store {
         this._selectionEnd = payload.selectionEnd;
 
         this._fire();
+    }
+
+    private _onInsertToken(token: string) {
+        const newMarkdown = `${this._markdownContent.substr(0, this._selectionStart)}\n${token}\n${this._markdownContent.substr(this._selectionStart)}`;
+        const diff = newMarkdown.length - this._markdownContent.length;
+
+        this._selectionStart += diff;
+        this._selectionEnd = this._selectionStart;
+
+        this._onSetMarkdownContent(newMarkdown);
     }
 }

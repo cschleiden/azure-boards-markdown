@@ -104,7 +104,7 @@ ${sharedStyles}
 
     export function format(formatAction: FormatAction, content: string): string {
         switch (formatAction) {
-            case FormatAction.Bold:                
+            case FormatAction.Bold:
                 return toggleToken("**", content);
 
             case FormatAction.Italic:
@@ -119,5 +119,9 @@ ${sharedStyles}
         } else {
             return `${token}${content}${token}`;
         }
+    }
+
+    export function imageToken(fileName: string, url: string): string {
+        return `![${fileName}](${url})`;
     }
 }

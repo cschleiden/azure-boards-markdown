@@ -4,7 +4,6 @@ import * as ReactDOM from "react-dom";
 import * as Dropzone from "react-dropzone";
 
 import { ActionsCreator } from "../actions/actionsCreators";
-import { UploadsService } from "../services/uploads";
 import { SizeMode } from "../model/model";
 
 export interface IEditorProps {
@@ -18,10 +17,6 @@ export interface IEditorProps {
 }
 
 export interface IEditorState {
-}
-
-function getImageToken(name: string, path: string): string {
-    return `![${name}](${path})`;
 }
 
 const heightAdjustmentInPx = 20;
@@ -44,13 +39,14 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
 
     public render(): JSX.Element {
         return <div className="editor">
-            <Dropzone onDrop={this._onDrop} disableClick={true} disablePreview={true} style={{}}>
+            <Dropzone onDrop={this._onDrop} disableClick={true} disablePreview={true} style={{}} className="drop-zone" activeClassName="drop-active" accept="image/*">
                 <textarea
                     value={this.props.markdownContent}
                     onChange={this._onChange}
                     onSelect={this._onSelect}
                     onPaste={this._onPaste}
                     ref={this._resolveTextarea}></textarea>
+                <div className="upload-hint">Drop to upload and insert images</div>
             </Dropzone>
         </div>;
     }
@@ -89,10 +85,11 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
     }
 
     private _onDrop = (files) => {
-        let tokens: string[] = [];
-        for (let file of files) {
-            this.props.actionsCreator.upload(file.name, file.path, file);
-        }
+        this.props.actionsCreator.upload(files.map(file => ({
+            fileName: file.name,
+            filePath: file.path,
+            file: file
+        })));
     }
 
     private _onSizeChange(force?: boolean) {

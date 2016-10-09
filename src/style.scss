@@ -1,3 +1,17 @@
+@mixin overlay {
+    position: absolute;
+    top: 0; right: 0; left: 0; bottom: 0;
+
+    padding-top: 75px;
+    text-align: center;
+
+    z-index: 1000;
+
+    font-size: larger;
+    font-weight: bold;
+}
+
+
 html, body, #content, #content > div {
     height: 100%;
 }
@@ -66,6 +80,22 @@ $toolbarHeight: 22px;
         border: none;
         outline: none;
     }
+
+    .upload-hint {
+        @include overlay;
+
+        color: white;
+        font-size: larger;
+        font-weight: bold;
+        background: #1BA1E2;
+        opacity: 0.7;        
+
+        display: none;
+    }
+
+    .drop-active .upload-hint {
+        display: block;   
+    }
 }
 
 .message {
@@ -95,4 +125,11 @@ $toolbarHeight: 22px;
         margin-top: 10px;
         text-align: right;
     }
+}
+
+.spinner {
+    @include overlay;
+
+    opacity: 0.7;
+    background: lightgray;
 }

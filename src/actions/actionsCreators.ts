@@ -1,8 +1,12 @@
+import * as Q from "q";
+
 import { IWorkItemControlAdapter } from "../adapter";
 import { MainStore } from "../store/store";
 
 import { ConflictResolution, SizeMode, FormatAction } from "../model/model";
+
 import { Markdown } from "../services/markdown";
+import { Uploads } from "../services/uploads";
 
 import { ActionsHub } from "./actions";
 
@@ -10,7 +14,8 @@ export class ActionsCreator {
     constructor(
         private _actionsHub: ActionsHub,
         private _store: MainStore,
-        private _adapter: IWorkItemControlAdapter) { }
+        private _adapter: IWorkItemControlAdapter,
+        private _uploads: Uploads) { }
 
     public setContentFromWorkItem(content: string) {
         this._actionsHub.setContentFromWorkItem.invoke(content);
@@ -50,8 +55,16 @@ export class ActionsCreator {
         this._actionsHub.resolveConflict.invoke(resolution);
     }
 
-    public upload(fileName: string, filePath: string, file: any) {
+    public upload(files: { fileName: string, filePath: string, file: any }[]) {
+        this._actionsHub.setProgress.invoke(true);
 
+        Q.all(files.map(file => this._uploads.startUpload(file.fileName, file.filePath, file.file))).then((results) => {
+            for (let result of results) {
+                this._actionsHub.insertToken.invoke(Markdown.imageToken(result.fileName, result.url));
+            }
+
+            this._actionsHub.setProgress.invoke(false);
+        });
     }
 
     public resize(height: number, force?: boolean) {

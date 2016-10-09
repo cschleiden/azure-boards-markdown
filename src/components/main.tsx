@@ -9,7 +9,7 @@ import { Mode, SizeMode, ConflictResolution, State, FormatAction } from "../mode
 import { MainStore } from "../store/store";
 import { ActionsCreator } from "../actions/actionsCreators";
 
-import { UploadsService } from "../services/uploads";
+import { Uploads } from "../services/uploads";
 
 export interface IMainProps extends React.Props<void> {
     store: MainStore;
@@ -27,6 +27,8 @@ export interface IMainState {
     htmlContent: string;
 
     selection: [number, number];
+
+    showProgress: boolean;
 }
 
 export class MainComponent extends React.Component<IMainProps, IMainState> {
@@ -54,7 +56,8 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             state: this.props.store.getState(),
             markdownContent: this.props.store.getMarkdown(),
             htmlContent: this.props.store.getHtmlContent(),
-            selection: this.props.store.getSelection()
+            selection: this.props.store.getSelection(),
+            showProgress: this.props.store.getProgress()
         };
     }
 
@@ -90,7 +93,8 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             if (this.state.state === State.Editor) {
                 editorToolbar = [
                     <span key="bold" className="bowtie-icon bowtie-format-bold" title="Bold [Ctrl + B]" onClick={() => this._onFormatting(FormatAction.Bold)}></span>,
-                    <span key="italic" className="bowtie-icon bowtie-format-italic" title="Italic [Ctrl + I]" onClick={() => this._onFormatting(FormatAction.Italic)}></span>
+                    <span key="italic" className="bowtie-icon bowtie-format-italic" title="Italic [Ctrl + I]" onClick={() => this._onFormatting(FormatAction.Italic)}></span>,
+                    <span key="image" className="bowtie-icon bowtie-image" title="Insert image" onClick={this._insertImage}></span>
                 ]
             }
 
@@ -102,11 +106,17 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             </div>;
         }
 
+        let progress: JSX.Element;
+        if (this.state.showProgress) {
+            progress = <div className="spinner">Working...</div>;
+        }
+
         return <div>
             {toolbar}
             <div className="md" onKeyDown={this._onKeyDown} tabindex="0">
                 {content}
             </div>
+            {progress}
         </div>;
     }
 
@@ -163,5 +173,9 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
 
     private _toggleAutoGrow = () => {
         this.props.actionsCreator.toggleSizeMode();
+    }
+
+    private _insertImage = () => {
+
     }
 }
