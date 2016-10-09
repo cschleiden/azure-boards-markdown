@@ -24,7 +24,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     private _store: MainStore;
     private _actionsCreator: ActionsCreator;
 
-    private _originalValue: string;
+    private _lastIncomingValue: string;
 
     constructor() {
         const config = VSS.getConfiguration();
@@ -40,22 +40,18 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
         this._actionsCreator = new ActionsCreator(actionsHub, this._store, this);
     }
 
-    private _lastFieldValue: string;
+    private _lastSetValue: string;
 
     private _onStoreChanged() {
         if (this._witService) {
             let newValue = this._store.getOutput();
-            if (newValue === this._lastFieldValue) {
-                return;
-            }
-
-            this._lastFieldValue = newValue;
 
             if (!this._store.isChanged()) {
-                newValue = this._originalValue;
+                newValue = this._lastIncomingValue;
             }
 
-            this._witService.setFieldValue(this._store.getFieldName(), newValue);            
+            this._lastSetValue = newValue;
+            this._witService.setFieldValue(this._store.getFieldName(), newValue);
         }
     }
 
@@ -82,7 +78,8 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
     public onFieldChanged(fieldChangedArgs: ExtensionContracts.IWorkItemFieldChangedArgs) {
         let changedValue = fieldChangedArgs.changedFields[this._store.getFieldName()];
-        if (changedValue && changedValue !== this._originalValue) {
+        if (changedValue && changedValue !== this._lastIncomingValue && changedValue !== this._lastSetValue) {
+            this._lastIncomingValue = changedValue;            
             this._changeField(changedValue);
         }
     }
@@ -109,7 +106,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     /** Get value from work item and update editor */
     private _reset() {
         this._witService.getFieldValue(this._store.getFieldName()).then(value => {
-            this._originalValue = value as string;
+            this._lastIncomingValue = value as string;
             this._changeField(value as string);
             this._actionsCreator.reset();
         });

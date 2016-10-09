@@ -166,6 +166,7 @@ export class MainStore extends Store {
     private _onSetMarkdownContent(markdownContent: string) {
         this._markdownContent = markdownContent;
         this._htmlContent = Markdown.renderMarkdown(this._markdownContent);
+        this._mode = Mode.Markdown;
 
         this._fire();
     }
@@ -218,6 +219,11 @@ export class MainStore extends Store {
         // Store original value
         if (!this._originalMarkdown) {
             this._onReset();
+        }
+
+        if (this._mode !== Mode.Markdown) {
+            // Force view to preview
+            this._state = State.Preview;
         }
 
         this._fire();
