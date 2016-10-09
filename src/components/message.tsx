@@ -1,10 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { Model, Mode, ConflictResolution } from "../model/model";
+import {  Mode, ConflictResolution } from "../model/model";
 
 export interface IMessageProps {
-    model: Model;
+    mode: Mode;
+
     onCancel: () => void;
     onProceed: (result: ConflictResolution) => void;
 }
@@ -21,7 +22,7 @@ export class MessageComponent extends React.Component<IMessageProps, void> {
         let buttons: ConflictResolution[];
 
 
-        switch (this.props.model.mode) {
+        switch (this.props.mode) {
             case Mode.Legacy:
                 message = "This field has been set using the legacy HTML editor. We will need to convert it to markdown. It will be a best-effort conversion and might not succeed in all cases.";
                 buttons = [ConflictResolution.Convert];

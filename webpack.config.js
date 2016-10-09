@@ -5,8 +5,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     target: "web",
     entry: {
-        registration: "./src/app.ts",
-        dialog: "./src/dialog.tsx"
+        registration: "./src/app.ts"
     },
     output: {
         filename: "src/[name].js",

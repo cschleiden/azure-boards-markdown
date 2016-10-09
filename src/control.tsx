@@ -1,5 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 
+import * as Q from "q";
+
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -7,33 +9,45 @@ import * as VSSService from "VSS/Service";
 import * as WitService from "TFS/WorkItemTracking/Services";
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
+import { IWorkItemControlAdapter } from "./adapter";
+
 import { MainComponent } from "./components/main"
 
-import { Model } from "./model/model";
-import { UploadsService } from "./services/uploads";
+import { MainStore } from "./store/store";
+import { ActionsHub } from "./actions/actions";
+import { ActionsCreator } from "./actions/actionsCreators";
 
-export class Control implements ExtensionContracts.IWorkItemNotificationListener {
+export class Control implements ExtensionContracts.IWorkItemNotificationListener, IWorkItemControlAdapter {
     private _witService: WitService.IWorkItemFormService;
-    private _uploadsService: UploadsService = new UploadsService();
 
-    private _model: Model = new Model();
-    private _ignoreIncomingChange = false;
+    private _store: MainStore;
+    private _actionsCreator: ActionsCreator;
 
-    private _minHeight: number;
-    private _maxHeight: number;
-    private _fieldName: string;
+    private _originalValue: string;
 
     constructor() {
         const config = VSS.getConfiguration();
-        this._fieldName = config.witInputs["FieldName"];
-        this._minHeight = Number(config.witInputs["height"]) || config.defaultHeight;
-        this._maxHeight = Number(config.witInputs["fullHeight"]) || 500;
 
-        this._model.addDataListener(() => this._onModelChange());
-        this._model.addStateListener(() => this._onModelStateChange());
+        const fieldName = config.witInputs["FieldName"];
+        const minHeight = Number(config.witInputs["height"]) || config.defaultHeight;
+        const maxHeight = Number(config.witInputs["fullHeight"]) || 500;
 
-        // TODO
-        this._model.setBlock(false);
+        const actionsHub = new ActionsHub();
+        this._store = new MainStore(actionsHub, fieldName, minHeight, maxHeight);
+        this._store.addListener(this._onStoreChanged.bind(this));
+
+        this._actionsCreator = new ActionsCreator(actionsHub, this._store, this);
+    }
+
+    private _onStoreChanged() {
+        if (this._witService) {
+            let newValue = this._store.getOutput();
+            if (!this._store.isChanged()) {
+                newValue = this._originalValue;
+            }
+
+            this._witService.setFieldValue(this._store.getFieldName(), newValue);
+        }
     }
 
     public onLoaded() {
@@ -55,29 +69,15 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     public onUnloaded() {
         let element = document.getElementById("content");
         ReactDOM.unmountComponentAtNode(element);
+
+        $(window).off("resize");
     }
 
     public onFieldChanged(fieldChangedArgs: ExtensionContracts.IWorkItemFieldChangedArgs) {
-        let changedValue = fieldChangedArgs.changedFields[this.getFieldName()];
+        let changedValue = fieldChangedArgs.changedFields[this._store.getFieldName()];
         if (changedValue) {
             this.onFieldChange(changedValue);
         }
-    }
-
-    /** Triggered when a change is triggered by the editor */
-    private _onModelChange() {
-        if (this._witService) {
-            this._ignoreIncomingChange = true;
-
-            this._witService.setFieldValue(this.getFieldName(), this._model.getOutput()).then(() => {
-                this._ignoreIncomingChange = false;
-            });
-        }
-    }
-
-    /** Triggered when non-data changes are triggered in editor */
-    private _onModelStateChange() {
-        this._updateSize();
     }
 
     /** Triggered when work item is saved */
@@ -95,62 +95,34 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     }
 
     /** Triggered when field value on work item changes */
-    public onFieldChange(value: string, lifeCycleEvent?: boolean) {
-        if (!this._ignoreIncomingChange) {
-            this._model.setInput(value, lifeCycleEvent);
-        }
+    public onFieldChange(value: string) {
+        this._actionsCreator.setContentFromWorkItem(value);
+    }
 
-        this._updateSize();
+    private _reset() {
+        this._actionsCreator.reset();
     }
 
     /** Get value from work item and update editor */
-    private _updateFromWorkItem() {
-        this._witService.getFieldValue(this.getFieldName()).then(value => {
-            this.onFieldChange(value as string, true);
-        });
-    }
+    private _updateFromWorkItem(reset?: boolean) {
+        this._witService.getFieldValue(this._store.getFieldName()).then(value => {
+            this._originalValue = value as string;
+            this._actionsCreator.reset();
 
-    public getFieldName(): string {
-        return this._fieldName;
+            this.onFieldChange(value as string);
+        });
     }
 
     private _render() {
         let element = document.getElementById("content");
-        ReactDOM.render(<MainComponent model={this._model} uploads={this._uploadsService} onSave={this._onSave} />, element);
+        ReactDOM.render(<MainComponent store={this._store} actionsCreator={this._actionsCreator} />, element);
     }
 
-    private _onSave = () => {
+    public save(): IPromise<void> {
         if (this._witService) {
-            this._witService.beginSaveWorkItem($.noop, $.noop);
-        }
-    }
-
-    private lastHeight: number = null;
-
-    private _updateSize() {
-        if (!this._model.showMessage) {
-            let newHeight: number;
-
-            if (this._model.autoGrow) {
-                newHeight = this._model.getDesiredHeight();
-
-                if (newHeight === null) {
-                    // Height not yet available, schedule for next tick
-                    setTimeout(() => this._updateSize(), 0);
-                    return;
-                }
-
-                // Clamp
-                newHeight = Math.min(this._maxHeight, Math.max(this._minHeight, newHeight));
-            } else {
-                newHeight = this._minHeight;
-            }
-
-            if (newHeight && newHeight !== this.lastHeight) {
-                VSS.resize(null, newHeight);
-            }
-
-            this.lastHeight = newHeight;
+            return Q.Promise<void>((resolve, reject) => {
+                this._witService.beginSaveWorkItem(() => resolve(null), () => reject(null));
+            });
         }
     }
 }

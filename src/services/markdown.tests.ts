@@ -2,19 +2,19 @@ import { expect } from "chai";
 
 import * as $ from "jquery";
 
-import { Model, Utils } from "./model";
+import { Markdown } from "./markdown";
 
 describe("Utils", () => {
     describe("parse input", () => {
         it("should identify md content", () => {
-            let result = Utils.extractMarkdown(`<p style="display:none;" id="md">md**test**</p>  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>`);
+            let result = Markdown.extractMarkdown(`<p style="display:none;" id="md">md**test**</p>  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>`);
 
             expect(result.markdownContent).to.be.eq("md**test**");
             expect(result.htmlContent).to.be.eq("  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>");
         });
 
         it("should identify legacy", () => {
-            let result = Utils.extractMarkdown(`<p>test</p>  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>`);
+            let result = Markdown.extractMarkdown(`<p>test</p>  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>`);
 
             expect(result.markdownContent).to.be.null;
             expect(result.htmlContent).to.be.eq("<p>test</p>  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>");
@@ -45,19 +45,19 @@ describe("Utils", () => {
     describe("roundtrips html", () => {
         it("should roundtrip code", () => {
             let input = "`code`";
-            let html = Utils.renderMarkdown(input);
-            let markdown = Utils.convertToMarkdown(html);
+            let html = Markdown.renderMarkdown(input);
+            let markdown = Markdown.convertToMarkdown(html);
             expect(markdown).to.eq(input);
         })
 
         it("should roundtrip quotes", () => {
             let input = `'""'`;
-            expect(Utils.convertToMarkdown(Utils.renderMarkdown(input))).to.eq(input);
+            expect(Markdown.convertToMarkdown(Markdown.renderMarkdown(input))).to.eq(input);
         })
     });
 
     const check = (input, output) => {
-        const test = Utils.convertToMarkdown(input);
+        const test = Markdown.convertToMarkdown(input);
         expect(test).to.equal(output);
     };
 });

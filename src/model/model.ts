@@ -1,11 +1,8 @@
-import * as $ from "jquery";
-
-import * as toMarkdown from "to-markdown";
-import * as marked from "marked";
-
-const __md = "__md";
-const __mdStyle = "__mdStyle";
-const __mdBlock = "__mdBlock";
+export enum State {
+    Preview,
+    Editor,
+    Message
+}
 
 export enum Mode {
     None = 0,
@@ -14,16 +11,20 @@ export enum Mode {
     Legacy
 }
 
+export enum SizeMode {
+    Default = 0,
+    AutoGrow
+}
+
 export enum ConflictResolution {
+    Cancel,
     Convert,
     Ignore
 }
 
-export const sharedStyles = require("raw!../assets/vsts-style.style");
-const block = `<div id="${__mdBlock}" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1000;background:transparent;cursor:not-allowed;" title="This content was edited using markdown, and is read-only in this editor"></div>`;
-
 const lineHeightInPx = 20;
 
+/*
 export class Model {
     public markdownContent: string;
     public htmlContent: string;
@@ -101,7 +102,7 @@ export class Model {
             }
 
             return null;
-        }*/
+        }
     }
 
     public cancelEdit() {
@@ -232,72 +233,4 @@ export class Model {
         }
     }
 }
-
-export namespace Utils {
-    function unescape(html: string): string {
-        return html
-            .replace(/&quot;/g, `"`)
-            .replace(/&#39;/g, `'`);
-    }
-
-    export function renderMarkdown(input: string): string {
-        return unescape(marked(input, {}));
-    }
-
-    export function convertToMarkdown(value: string): string {
-        // Work around strange spacing issues
-        value = value.replace("&nbsp;", " ");
-
-        return toMarkdown(value, {
-            converters: [
-                {
-                    filter: "&nbsp;",
-                    replacement: (innerHtml) => " "
-                },
-                {
-                    filter: ["span"],
-                    replacement: (innerHtml, node: HTMLSpanElement) => {
-                        if (node.style && node.style.fontStyle) {
-                            if (node.style.fontStyle === "italic") {
-                                return `_${innerHtml}_`;
-                            } else if (node.style.fontStyle === "italic") {
-                                return `*${innerHtml}*`;
-                            }
-                        }
-
-                        return innerHtml;
-                    }
-                },
-                {
-                    filter: ["div"],
-                    replacement: (innerHtml) => `\n${innerHtml}`
-                }
-            ]
-        });
-    }
-
-    export function extractMarkdown(value: string): { markdownContent: string; htmlContent: string; } {
-        let parsed = $("<div></div>").html(value);
-        parsed.find(`#${__mdStyle}`).remove();
-        parsed.find(`#${__mdBlock}`).remove();
-        let inputHtml = parsed.find(`.rendered-markdown`).html();
-        let mdElement = parsed.find(`#${__md}`);
-
-        if (mdElement.length === 0) {
-            // No hidden md content found
-            return {
-                markdownContent: null,
-                htmlContent: value
-            };
-        } else {
-            // Hiden md content found
-            const md = mdElement.text();
-            mdElement.remove();
-
-            return {
-                markdownContent: md,
-                htmlContent: unescape(inputHtml)
-            };
-        }
-    }
-}
+*/

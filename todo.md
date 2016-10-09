@@ -1,0 +1,2 @@
+- Set height attributes on img
+- Attach click handlers on img
