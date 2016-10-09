@@ -30,6 +30,10 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
         </div>;
     }
 
+    public shouldComponentUpdate(nextProps: IPreviewProps): boolean {
+        return this.props.htmlContent !== nextProps.htmlContent || this.props.sizeMode !== nextProps.sizeMode;
+    }
+
     private _contentDidMount = () => {
         if (this._contentElement) {
             let finishedCount = 0;
