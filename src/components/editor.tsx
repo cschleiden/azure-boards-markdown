@@ -29,6 +29,11 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         this._textarea = el;
     }
 
+    private _dropZone: ReactDropzone.Dropzone;
+    private _resolveDropZone = (dropZone: ReactDropzone.Dropzone) => {
+        this._dropZone = dropZone;
+    }
+
     private _lastHeight: number;
 
     constructor(props: IEditorProps) {
@@ -39,7 +44,15 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
 
     public render(): JSX.Element {
         return <div className="editor">
-            <Dropzone onDrop={this._onDrop} disableClick={true} disablePreview={true} style={{}} className="drop-zone" activeClassName="drop-active" accept="image/*">
+            <Dropzone
+                onDrop={this._onDrop}
+                disableClick={true}
+                disablePreview={true}
+                style={{}}
+                className="drop-zone"
+                activeClassName="drop-active"
+                accept="image/*"
+                ref={this._resolveDropZone}>
                 <textarea
                     value={this.props.markdownContent}
                     onChange={this._onChange}
@@ -49,6 +62,12 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
                 <div className="upload-hint">Drop to upload and insert images</div>
             </Dropzone>
         </div>;
+    }
+
+    public openFileSelector() {
+        if (this._dropZone) {
+            (this._dropZone as any).open();
+        }
     }
 
     public componentDidMount() {

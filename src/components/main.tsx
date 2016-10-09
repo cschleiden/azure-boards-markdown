@@ -32,6 +32,9 @@ export interface IMainState {
 }
 
 export class MainComponent extends React.Component<IMainProps, IMainState> {
+    private _editor: EditorComponent;
+    private _resolveEditor = (editor) => this._editor = editor;
+
     constructor(props: IMainProps) {
         super(props);
 
@@ -82,7 +85,8 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
                     markdownContent={this.state.markdownContent}
                     sizeMode={this.state.sizeMode}
                     canGrow={this.state.canGrow}
-                    selection={this.state.selection} />;
+                    selection={this.state.selection}
+                    ref={this._resolveEditor} />;
                 break;
         }
 
@@ -176,6 +180,8 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
     }
 
     private _insertImage = () => {
-
+        if (this._editor) {
+            this._editor.openFileSelector();
+        }
     }
 }
