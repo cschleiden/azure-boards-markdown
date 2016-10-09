@@ -111,6 +111,8 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
                     this._lastHeight = scrollHeight;
                 }
             }
+        } else {
+            this._lastHeight = null;
         }
     }
 
