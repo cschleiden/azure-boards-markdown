@@ -84,7 +84,7 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         return this.props.markdownContent !== nextProps.markdownContent
             || this.props.sizeMode !== nextProps.sizeMode
             || this.props.canGrow !== nextProps.canGrow
-            || this.props.actionsCreator !== nextProps.actionsCreator
+            || this.props.actionsCreator !== nextProps.actionsCreator            
             || (EditorComponent._isValidSelection(nextProps.selection) && this._textarea && this._textarea.selectionStart !== nextProps.selection[0] && this._textarea.selectionEnd !== nextProps[1]);
     }
 
