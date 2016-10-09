@@ -7,6 +7,8 @@ export function throttle(throttleMs: number, action: Function, leading: boolean 
             if (leading) {
                 // Execute on leading edge
                 action();
+            } else {
+                trailingEdge = true;
             }
 
             timeoutHandle = window.setTimeout(() => {
