@@ -5,7 +5,7 @@ import { MessageComponent } from "./message";
 import { EditorComponent } from "./editor";
 import { PreviewComponent } from "./preview";
 
-import { Mode, SizeMode, ConflictResolution, State } from "../model/model";
+import { Mode, SizeMode, ConflictResolution, State, FormatAction } from "../model/model";
 import { MainStore } from "../store/store";
 import { ActionsCreator } from "../actions/actionsCreators";
 
@@ -25,6 +25,8 @@ export interface IMainState {
 
     markdownContent: string;
     htmlContent: string;
+
+    selection: [number, number];
 }
 
 export class MainComponent extends React.Component<IMainProps, IMainState> {
@@ -51,7 +53,8 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             canGrow: this.props.store.canGrow(),
             state: this.props.store.getState(),
             markdownContent: this.props.store.getMarkdown(),
-            htmlContent: this.props.store.getHtmlContent()
+            htmlContent: this.props.store.getHtmlContent(),
+            selection: this.props.store.getSelection()
         };
     }
 
@@ -75,35 +78,71 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
                     actionsCreator={this.props.actionsCreator}
                     markdownContent={this.state.markdownContent}
                     sizeMode={this.state.sizeMode}
-                    canGrow={this.state.canGrow} />;
+                    canGrow={this.state.canGrow}
+                    selection={this.state.selection} />;
                 break;
         }
 
-        return <div>
-            {showToolbar ? <div className="toolbar">
-                <span className="bowtie-icon bowtie-format-bold" title="Bold"></span>
+        let toolbar: JSX.Element = null;
+        if (showToolbar) {
+            let editorToolbar: JSX.Element[] = null;
 
-                <span className={"right bowtie-icon " + (this.state.sizeMode === SizeMode.AutoGrow ? "bowtie-fold-less" : "bowtie-fold-more")} title="Toggle auto grow" onClick={this._toggleAutoGrow}></span>
-                <span className={"right bowtie-icon " + (this.state.state === State.Preview ? "bowtie-edit-outline" : "bowtie-file-preview")} title={(this.state.state === State.Preview ? "Preview" : "Edit")} onClick={this._toggleEditMode}></span>
-            </div> : null}
+            if (this.state.state === State.Editor) {
+                editorToolbar = [
+                    <span key="bold" className="bowtie-icon bowtie-format-bold" title="Bold [Ctrl + B]" onClick={() => this._onFormatting(FormatAction.Bold)}></span>,
+                    <span key="italic" className="bowtie-icon bowtie-format-italic" title="Italic [Ctrl + I]" onClick={() => this._onFormatting(FormatAction.Italic)}></span>
+                ]
+            }
+
+            toolbar = <div className="toolbar">
+                {editorToolbar}
+
+                <span className={"right bowtie-icon " + (this.state.sizeMode === SizeMode.AutoGrow ? "bowtie-fold-less" : "bowtie-fold-more")} title={this.state.sizeMode === SizeMode.AutoGrow ? "Disable auto size" : "Enable auto size"} onClick={this._toggleAutoGrow}></span>
+                <span className={"right bowtie-icon " + (this.state.state === State.Preview ? "bowtie-edit-outline" : "bowtie-file-preview")} title={(this.state.state === State.Preview ? "Preview [Ctrl + Shift + V]" : "Edit")} onClick={this._toggleEditMode}></span>
+            </div>;
+        }
+
+        return <div>
+            {toolbar}
             <div className="md" onKeyDown={this._onKeyDown} tabindex="0">
                 {content}
             </div>
         </div>;
     }
 
+    private _onFormatting = (formatAction: FormatAction) => {
+        this.props.actionsCreator.applyFormatting(formatAction);
+    };
+
     private _onKeyDown = (event: React.KeyboardEvent) => {
         if (event.ctrlKey) {
-            if (event.key === "s") {
-                this.props.actionsCreator.save();
 
-                event.preventDefault();
-                return false;
+            let handled = false;
+            switch (event.key.toLowerCase()) {
+                case "b":
+                    this.props.actionsCreator.applyFormatting(FormatAction.Bold);
+                    handled = true;
+                    break;
+
+                case "i":
+                    this.props.actionsCreator.applyFormatting(FormatAction.Italic);
+                    handled = true;
+                    break;
+
+                case "s":
+                    this.props.actionsCreator.save();
+                    handled = true;
+                    break;
+
+                case "v":
+                    if (event.shiftKey) {
+                        this.props.actionsCreator.toggleState();
+                    }
+                    handled = true;
+                    break;
             }
 
-            if (event.shiftKey && event.key.toLowerCase() === "v") {
-                this.props.actionsCreator.toggleState();
-
+            if (handled) {
                 event.preventDefault();
                 return false;
             }

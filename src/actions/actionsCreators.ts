@@ -1,7 +1,8 @@
 import { IWorkItemControlAdapter } from "../adapter";
 import { MainStore } from "../store/store";
 
-import { ConflictResolution, SizeMode } from "../model/model";
+import { ConflictResolution, SizeMode, FormatAction } from "../model/model";
+import { Markdown } from "../services/markdown";
 
 import { ActionsHub } from "./actions";
 
@@ -42,7 +43,7 @@ export class ActionsCreator {
     }
 
     public resolveConflict(resolution: ConflictResolution) {
-
+        this._actionsHub.resolveConflict.invoke(resolution);
     }
 
     public upload(fileName: string, filePath: string, file: any) {
@@ -56,6 +57,27 @@ export class ActionsCreator {
 
         if (force || oldHeight !== this._store.getHeight()) {
             VSS.resize(null, this._store.getHeight());
+        }
+    }
+
+    public changeSelection(selectionStart: number, selectionEnd: number) {
+        this._actionsHub.changeSelection.invoke({ selectionStart, selectionEnd });
+    }
+
+    public applyFormatting(formatAction: FormatAction) {
+        const [selectionStart, selectionEnd] = this._store.getSelection();
+
+        if (selectionStart != null && selectionEnd != null && selectionStart !== selectionEnd) {
+            const oldMarkdown = this._store.getMarkdown();
+            const newMarkdown = Markdown.applyFormatting(selectionStart, selectionEnd, formatAction, oldMarkdown);
+
+            const diff = newMarkdown.length - oldMarkdown.length;
+
+            this._actionsHub.setMarkdownContent.invoke(newMarkdown);
+            this._actionsHub.changeSelection.invoke({
+                selectionStart: selectionStart,
+                selectionEnd: selectionEnd + diff
+            });
         }
     }
 }

@@ -3,6 +3,7 @@ import { expect } from "chai";
 import * as $ from "jquery";
 
 import { Markdown } from "./markdown";
+import { FormatAction } from "../model/model";
 
 describe("Utils", () => {
     describe("parse input", () => {
@@ -54,6 +55,17 @@ describe("Utils", () => {
             let input = `'""'`;
             expect(Markdown.convertToMarkdown(Markdown.renderMarkdown(input))).to.eq(input);
         })
+    });
+
+    describe("toggle formatting tokens", () => {
+        expect(Markdown.toggleToken("**", "test")).to.be.eq("**test**");
+        expect(Markdown.toggleToken("**", "**test**")).to.be.eq("test");
+        expect(Markdown.toggleToken("**", "****test****")).to.be.eq("**test**");
+    });
+
+    describe("toggle formatting tokens", () => {
+        expect(Markdown.format(FormatAction.Bold, "test")).to.be.eq("**test**");
+        expect(Markdown.format(FormatAction.Italic, "test")).to.be.eq("_test_");
     });
 
     const check = (input, output) => {

@@ -31,6 +31,11 @@ export class Action<TPayload> {
     }
 }
 
+export interface ISelectionChangePayload {
+    selectionStart: number;
+    selectionEnd: number;
+}
+
 export class ActionsHub {
     public reset = new Action<void>();
 
@@ -48,4 +53,6 @@ export class ActionsHub {
     public toggleSizeMode = new Action<void>();
 
     public resize = new Action<number>();
+
+    public changeSelection = new Action<ISelectionChangePayload>();
 }

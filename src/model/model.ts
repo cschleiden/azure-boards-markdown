@@ -22,6 +22,14 @@ export enum ConflictResolution {
     Ignore
 }
 
+export enum FormatAction {
+    Bold,
+    Italic,
+    Heading1,
+    Heading2,
+    Heading3
+}
+
 const lineHeightInPx = 20;
 
 /*

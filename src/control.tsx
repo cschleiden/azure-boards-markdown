@@ -10,10 +10,11 @@ import * as WitService from "TFS/WorkItemTracking/Services";
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
 import { IWorkItemControlAdapter } from "./adapter";
+import { throttle } from "./utils/throttle";
 
 import { MainComponent } from "./components/main"
 
-import { MainStore } from "./store/store";
+import { MainStore, IStoreListener } from "./store/store";
 import { ActionsHub } from "./actions/actions";
 import { ActionsCreator } from "./actions/actionsCreators";
 
@@ -34,25 +35,33 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
         const actionsHub = new ActionsHub();
         this._store = new MainStore(actionsHub, fieldName, minHeight, maxHeight);
-        this._store.addListener(this._onStoreChanged.bind(this));
+        this._store.addListener(throttle(200, this._onStoreChanged.bind(this)) as IStoreListener);
 
         this._actionsCreator = new ActionsCreator(actionsHub, this._store, this);
     }
 
+    private _lastFieldValue: string;
+
     private _onStoreChanged() {
         if (this._witService) {
             let newValue = this._store.getOutput();
+            if (newValue === this._lastFieldValue) {
+                return;
+            }
+
+            this._lastFieldValue = newValue;
+
             if (!this._store.isChanged()) {
                 newValue = this._originalValue;
             }
 
-            this._witService.setFieldValue(this._store.getFieldName(), newValue);
+            this._witService.setFieldValue(this._store.getFieldName(), newValue);            
         }
     }
 
     public onLoaded() {
         let cont = () => {
-            this._updateFromWorkItem();
+            this._reset();
             this._render();
         }
 
@@ -69,47 +78,40 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     public onUnloaded() {
         let element = document.getElementById("content");
         ReactDOM.unmountComponentAtNode(element);
-
-        $(window).off("resize");
     }
 
     public onFieldChanged(fieldChangedArgs: ExtensionContracts.IWorkItemFieldChangedArgs) {
         let changedValue = fieldChangedArgs.changedFields[this._store.getFieldName()];
-        if (changedValue) {
-            this.onFieldChange(changedValue);
+        if (changedValue && changedValue !== this._originalValue) {
+            this._changeField(changedValue);
         }
     }
 
     /** Triggered when work item is saved */
     public onSaved() {
-        this._updateFromWorkItem();
+        this._reset();
     }
 
     public onRefreshed() {
-        this._updateFromWorkItem();
+        this._reset();
     }
 
     /** Triggered when work item is refreshed or reset */
     public onReset() {
-        this._updateFromWorkItem();
+        this._reset();
     }
 
     /** Triggered when field value on work item changes */
-    public onFieldChange(value: string) {
+    private _changeField(value: string) {
         this._actionsCreator.setContentFromWorkItem(value);
     }
 
-    private _reset() {
-        this._actionsCreator.reset();
-    }
-
     /** Get value from work item and update editor */
-    private _updateFromWorkItem(reset?: boolean) {
+    private _reset() {
         this._witService.getFieldValue(this._store.getFieldName()).then(value => {
             this._originalValue = value as string;
+            this._changeField(value as string);
             this._actionsCreator.reset();
-
-            this.onFieldChange(value as string);
         });
     }
 

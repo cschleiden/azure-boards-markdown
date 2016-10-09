@@ -1,5 +1,5 @@
-import { Mode, State, SizeMode } from "../model/model";
-import { ActionsHub } from "../actions/actions";
+import { Mode, State, SizeMode, FormatAction, ConflictResolution } from "../model/model";
+import { ActionsHub, ISelectionChangePayload } from "../actions/actions";
 
 import { Markdown } from "../services/markdown";
 
@@ -44,7 +44,8 @@ export class MainStore extends Store {
     private _state: State = State.Preview;
     private _mode: Mode = Mode.None;
 
-    private _pendingStores: number = 0;
+    private _selectionStart: number = null;
+    private _selectionEnd: number = null;
 
     constructor(private _actionsHub: ActionsHub, fieldName: string, minHeight: number, maxHeight: number) {
         super();
@@ -65,9 +66,11 @@ export class MainStore extends Store {
         return this._fieldName;
     }
 
-    public getOutput(): string {
-        this._pendingStores++;
+    public getSelection(): [number, number] {
+        return [this._selectionStart, this._selectionEnd];
+    }
 
+    public getOutput(): string {
         return Markdown.buildOutput(this._markdownContent || "");
     }
 
@@ -114,15 +117,38 @@ export class MainStore extends Store {
     private _subscribeToActions() {
         this._actionsHub.setContentFromWorkItem.addListener(this._onSetContentFromWorkItem.bind(this));
         this._actionsHub.setMarkdownContent.addListener(this._onSetMarkdownContent.bind(this));
+        this._actionsHub.resolveConflict.addListener(this._onResolveConflict.bind(this));
 
         this._actionsHub.toggleState.addListener(this._onToggleState.bind(this));
         this._actionsHub.toggleSizeMode.addListener(this._onToggleSizeMode.bind(this));
         this._actionsHub.resize.addListener(this._onResize.bind(this));
         this._actionsHub.reset.addListener(this._onReset.bind(this));
+
+        this._actionsHub.changeSelection.addListener(this._onChangeSelection.bind(this));
     }
 
     private _onReset() {
         this._originalMarkdown = this._markdownContent;
+    }
+
+    private _onResolveConflict(resolution: ConflictResolution) {
+        switch (resolution) {
+            case ConflictResolution.Cancel:
+                this._state = State.Preview;
+                break;
+
+            case ConflictResolution.Convert:
+                this._markdownContent = Markdown.convertToMarkdown(this._htmlContent);
+                this._state = State.Editor;
+                break;
+
+            case ConflictResolution.Ignore:
+                this._htmlContent = Markdown.renderMarkdown(this._markdownContent);
+                this._state = State.Editor;
+                break;
+        }
+
+        this._fire();
     }
 
     private _onResize(height: number) {
@@ -145,7 +171,12 @@ export class MainStore extends Store {
     }
 
     private _onToggleState() {
-        this._state = this._state === State.Editor ? State.Preview : State.Editor;
+        if (this._mode === Mode.Markdown) {
+            // Normal toggle
+            this._state = this._state === State.Editor ? State.Preview : State.Editor;
+        } else {
+            this._state = State.Message;
+        }
 
         this._fire();
     }
@@ -161,11 +192,6 @@ export class MainStore extends Store {
     }
 
     private _onSetContentFromWorkItem(rawInput: string) {
-        if (this._pendingStores > 0) {
-            --this._pendingStores;
-            return;
-        }
-
         const { markdownContent, htmlContent } = Markdown.extractMarkdown(rawInput);
 
         if (!markdownContent && !htmlContent) {
@@ -193,6 +219,13 @@ export class MainStore extends Store {
         if (!this._originalMarkdown) {
             this._onReset();
         }
+
+        this._fire();
+    }
+
+    public _onChangeSelection(payload: ISelectionChangePayload) {
+        this._selectionStart = payload.selectionStart;
+        this._selectionEnd = payload.selectionEnd;
 
         this._fire();
     }

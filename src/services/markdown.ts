@@ -1,6 +1,8 @@
 import * as toMarkdown from "to-markdown";
 import * as marked from "marked";
 
+import { FormatAction } from "../model/model";
+
 export const sharedStyles = require("raw!../assets/vsts-style.style");
 
 const __md = "__md";
@@ -75,8 +77,8 @@ export namespace Markdown {
         }
     }
 
-    export function buildOutput(markdownContent: string): string {        
-        let htmlContent = renderMarkdown(markdownContent);            
+    export function buildOutput(markdownContent: string): string {
+        let htmlContent = renderMarkdown(markdownContent);
 
         htmlContent = htmlContent.replace(/id="(.+)"/g, "id=$1");
 
@@ -91,5 +93,29 @@ ${sharedStyles}
         const trimmedHtmlContent = inputHtmlContent.trim();
 
         return (trimmedHtmlContent !== "" && trimmedHtmlContent !== generatedMarkdownContenxt.trim());
+    }
+
+    export function applyFormatting(selectionStart: number, selectionEnd: number, formatAction: FormatAction, markdownContent: string): string {
+        let contentToBeFormatted = markdownContent.substr(selectionStart, selectionEnd - selectionStart);
+        return markdownContent.substr(0, selectionStart) + format(formatAction, contentToBeFormatted) + markdownContent.substr(selectionEnd);
+    }
+
+    export function format(formatAction: FormatAction, content: string): string {
+        switch (formatAction) {
+            case FormatAction.Bold:                
+                return toggleToken("**", content);
+
+            case FormatAction.Italic:
+                return toggleToken("_", content);
+        }
+    }
+
+    export function toggleToken(token: string, content: string): string {
+        const tokenLength = token.length;
+        if (content.substr(0, tokenLength) === token && content.substr(content.length - tokenLength) === token) {
+            return content.substr(tokenLength, content.length - (tokenLength * 2));
+        } else {
+            return `${token}${content}${token}`;
+        }
     }
 }

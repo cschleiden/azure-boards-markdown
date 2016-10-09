@@ -13,6 +13,8 @@ export interface IEditorProps {
     markdownContent: string;
     sizeMode: SizeMode;
     canGrow: boolean;
+
+    selection: [number, number];
 }
 
 export interface IEditorState {
@@ -61,6 +63,29 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         }
     }
 
+    public shouldComponentUpdate(nextProps: IEditorProps): boolean {
+        return this.props.markdownContent !== nextProps.markdownContent
+            || this.props.sizeMode !== nextProps.sizeMode
+            || this.props.canGrow !== nextProps.canGrow
+            || this.props.actionsCreator !== nextProps.actionsCreator
+            || (EditorComponent._isValidSelection(nextProps.selection) && this._textarea && this._textarea.selectionStart !== nextProps.selection[0] && this._textarea.selectionEnd !== nextProps[1]);
+    }
+
+    private static _isValidSelection(selection: [number, number]): boolean {
+        return selection && selection[0] != null && selection[1] != null && selection[0] !== selection[1];
+    }
+
+    public componentDidUpdate() {
+        // Restore selection if requested    
+        if (this.props.selection && this._textarea) {
+            let [selectionStart, selectionEnd] = this.props.selection;
+
+            if (selectionStart != null && selectionEnd != null && selectionEnd - selectionStart > 0) {
+                this._textarea.setSelectionRange(selectionStart, selectionEnd);
+            }
+        }
+    }
+
     private _onDrop = (files) => {
         let tokens: string[] = [];
         for (let file of files) {
@@ -94,7 +119,7 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
                 const oldHeight = this._textarea.style.height;
                 this._textarea.style.height = "auto";
                 const scrollHeight = this._textarea.scrollHeight + heightAdjustmentInPx;
-                this._textarea.style.height = oldHeight;                
+                this._textarea.style.height = oldHeight;
 
                 this.props.actionsCreator.resize(scrollHeight);
             }
@@ -107,8 +132,10 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         this._onSizeChange();
     };
 
-    private _onSelect = () => {
-
+    private _onSelect = (event: React.SyntheticEvent) => {
+        if (this._textarea) {
+            this.props.actionsCreator.changeSelection(this._textarea.selectionStart, this._textarea.selectionEnd);
+        }
     }
 
     private _onPaste = () => {
