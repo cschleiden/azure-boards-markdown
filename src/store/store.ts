@@ -49,9 +49,10 @@ export class MainStore extends Store {
     private _selectionStart: number = null;
     private _selectionEnd: number = null;
 
-    private _save: (value: string) => void;
+    private _triggerSave: (value: string) => void;
+    private _triggerSettings: () => void;
 
-    constructor(private _actionsHub: ActionsHub, fieldName: string, minHeight: number, maxHeight: number, triggerSave: (value: string) => void) {
+    constructor(private _actionsHub: ActionsHub, fieldName: string, minHeight: number, maxHeight: number, triggerSave: (value: string) => void, triggerSettings: () => void) {
         super();
 
         this._setupServices();
@@ -60,7 +61,8 @@ export class MainStore extends Store {
         this._minHeight = minHeight;
         this._maxHeight = maxHeight;
 
-        this._save = triggerSave;
+        this._triggerSave = triggerSave;
+        this._triggerSettings = triggerSettings;
 
         this._subscribeToActions();
     }
@@ -127,6 +129,7 @@ export class MainStore extends Store {
 
         this._actionsHub.toggleState.addListener(this._onToggleState.bind(this));
         this._actionsHub.toggleSizeMode.addListener(this._onToggleSizeMode.bind(this));
+        this._actionsHub.setSizeMode.addListener(this._onSetSizeMode.bind(this));
         this._actionsHub.resize.addListener(this._onResize.bind(this));
         this._actionsHub.reset.addListener(this._onReset.bind(this));
 
@@ -134,8 +137,13 @@ export class MainStore extends Store {
     }
 
     private _fireSave = throttle(500, () => {
-        this._save(this.getOutput());
+        this._triggerSave(this.getOutput());
     }, false);
+
+    /** Indicate that settings have changed */
+    private _fireSettings() {
+        this._triggerSettings();
+    }
 
     private _onReset() {
         this._originalMarkdown = this._markdownContent;
@@ -210,6 +218,14 @@ export class MainStore extends Store {
             this._onResize(this._minHeight);
         }
 
+        this._fireSettings();
+        this._fire();
+    }
+
+    private _onSetSizeMode(sizeMode: SizeMode) {
+        this._sizeMode = sizeMode;
+
+        this._fireSettings();
         this._fire();
     }
 

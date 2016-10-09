@@ -18,6 +18,8 @@ describe("StoreTests", () => {
         saveCalled = 0;
         store = new MainStore(actionsHub, "System.Field", 150, 500, (output: string) => {
             ++saveCalled;
+        }, () => {
+            // Settings
         });
 
         fireCalled = 0;

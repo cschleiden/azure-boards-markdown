@@ -10,24 +10,23 @@ import * as WitService from "TFS/WorkItemTracking/Services";
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
 import { IWorkItemControlAdapter } from "./adapter";
-import { throttle } from "./utils/throttle";
 
 import { MainComponent } from "./components/main"
 
 import { MainStore, IStoreListener } from "./store/store";
 import { ActionsHub, IActionHandler } from "./actions/actions";
 import { ActionsCreator } from "./actions/actionsCreators";
+import { SizeMode } from "./model/model";
 
 export class Control implements ExtensionContracts.IWorkItemNotificationListener, IWorkItemControlAdapter {
     private _witService: WitService.IWorkItemFormService;
+    private _dataService: IExtensionDataService;
 
     private _store: MainStore;
     private _actionsCreator: ActionsCreator;
 
-    private _lastIncomingValue: string;
-
     constructor() {
-        const config = VSS.getConfiguration();
+        const config = VSS.getConfiguration();        
 
         const fieldName = config.witInputs["FieldName"];
         const minHeight = Number(config.witInputs["height"]) || config.defaultHeight;
@@ -37,39 +36,33 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
         this._store = new MainStore(actionsHub, fieldName, minHeight, maxHeight, (output: string) => {
             this._witService.setFieldValue(this._store.getFieldName(), output);
             console.log("Saving - Saved");
+        }, () => {
+            this._storeSettings();
         });
-        //this._store.addListener(throttle(200, this._onStoreChanged.bind(this)) as IStoreListener);
 
         this._actionsCreator = new ActionsCreator(actionsHub, this._store, this);
 
-        //actionsHub.setMarkdownContent.addListener(throttle(200, this._onStoreChanged.bind(this)) as IActionHandler<string>);
+        this._loadSettings();
     }
 
-    private _lastSetValue: string;
+    private _loadSettings() {
+        VSS.getService(VSS.ServiceIds.ExtensionData).then((dataService: IExtensionDataService) => {
+            this._dataService = dataService;
 
-    private _lastOutput: string;
+            this._dataService.getValue<string>("SizeMode", {
+                scopeType: "User",
+                defaultValue: SizeMode[SizeMode.Default]
+            }).then(sizeMode => {
+                let storedSizeMode = SizeMode[sizeMode];
+                this._actionsCreator.setSizeMode(storedSizeMode);
+            });
+        })
+    }
 
-    private _onStoreChanged() {
-        if (this._witService) {
-            let newValue = this._store.getOutput();
-
-            if (newValue === this._lastOutput) {
-                console.log("Saving - Discard, same as lastoutput");
-                return;
-            }
-            this._lastOutput = newValue;
-
-
-            if (newValue === this._lastSetValue) {
-                console.log("Saving - Discard, same as lastSet");
-                return;
-            }
-            this._lastSetValue = newValue;
-            
-            console.log("Saving - Saved");
-
-            this._witService.setFieldValue(this._store.getFieldName(), newValue);
-        }
+    private _storeSettings() {
+        this._dataService.setValue("SizeMode", SizeMode[this._store.getSizeMode()], {
+            scopeType: "User"            
+        })
     }
 
     public onLoaded() {
@@ -135,8 +128,6 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     /** Get value from work item and update editor */
     private _reset() {
         this._witService.getFieldValue(this._store.getFieldName()).then(value => {
-            this._lastIncomingValue = value as string;
-            this._lastSetValue = value as string;
             this._changeField(value as string);
             this._actionsCreator.reset();
         });

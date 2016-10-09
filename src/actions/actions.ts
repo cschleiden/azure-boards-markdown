@@ -54,6 +54,7 @@ export class ActionsHub {
 
     public toggleState = new Action<void>("toggleState");
 
+    public setSizeMode = new Action<Model.SizeMode>("setSizeMode");
     public toggleSizeMode = new Action<void>("toggleSizeMode");
 
     public resize = new Action<number>("resize");

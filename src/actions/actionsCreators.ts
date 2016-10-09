@@ -42,6 +42,10 @@ export class ActionsCreator {
         }
     }
 
+    public setSizeMode(sizeMode: SizeMode) {
+        this._actionsHub.setSizeMode.invoke(sizeMode);
+    }
+
     public resolveConflict(resolution: ConflictResolution) {
         this._actionsHub.resolveConflict.invoke(resolution);
     }
