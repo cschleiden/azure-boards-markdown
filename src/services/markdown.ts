@@ -19,7 +19,7 @@ renderer.image = (href: string, title: string, text: string): string => {
 
     const height = ImageSizeCache.getInstance().get(href);
     if (height) {
-        img = img.substr(0, img.length - 1) + ` height="${height}" >`;
+        img = img.substr(0, img.length - 1) + ` height="${height}">`;
     }
 
     return img;
@@ -88,6 +88,14 @@ export namespace Markdown {
             const md = mdElement.text();
             mdElement.remove();
 
+            // Store any image reference
+            parsed.find("img").each((idx, elem: HTMLImageElement) => {
+                const height = Number($(elem).attr("height"));
+                if (height) {
+                    ImageSizeCache.getInstance().store(elem.src, height);
+                }
+            });
+
             return {
                 markdownContent: md,
                 htmlContent: unescape(inputHtml)
@@ -107,7 +115,6 @@ ${sharedStyles}
 
     export function compare(markdownContent: string, inputHtmlContent: string): boolean {
         const generatedMarkdownContenxt = Markdown.renderMarkdown(markdownContent);
-
         const trimmedHtmlContent = inputHtmlContent.trim();
 
         return (trimmedHtmlContent !== "" && trimmedHtmlContent !== generatedMarkdownContenxt.trim());
