@@ -3,6 +3,8 @@ import { ActionsHub, ISelectionChangePayload } from "../actions/actions";
 
 import { Markdown } from "../services/markdown";
 
+import { throttle } from "../utils/throttle";
+
 export interface IStoreListener {
     (): void;
 }
@@ -47,7 +49,9 @@ export class MainStore extends Store {
     private _selectionStart: number = null;
     private _selectionEnd: number = null;
 
-    constructor(private _actionsHub: ActionsHub, fieldName: string, minHeight: number, maxHeight: number) {
+    private _save: (value: string) => void;
+
+    constructor(private _actionsHub: ActionsHub, fieldName: string, minHeight: number, maxHeight: number, triggerSave: (value: string) => void) {
         super();
 
         this._setupServices();
@@ -55,6 +59,8 @@ export class MainStore extends Store {
         this._fieldName = fieldName;
         this._minHeight = minHeight;
         this._maxHeight = maxHeight;
+
+        this._save = triggerSave;
 
         this._subscribeToActions();
     }
@@ -127,8 +133,15 @@ export class MainStore extends Store {
         this._actionsHub.changeSelection.addListener(this._onChangeSelection.bind(this));
     }
 
+    private _fireSave = throttle(500, () => {
+        this._save(this.getOutput());
+    }, false);
+
     private _onReset() {
         this._originalMarkdown = this._markdownContent;
+        this._state = State.Preview;
+
+        this._fire();
     }
 
     private _onResolveConflict(resolution: ConflictResolution) {
@@ -139,12 +152,19 @@ export class MainStore extends Store {
 
             case ConflictResolution.Convert:
                 this._markdownContent = Markdown.convertToMarkdown(this._htmlContent);
+                this._mode = Mode.Markdown;
                 this._state = State.Editor;
+
+                this._fireSave();
                 break;
 
             case ConflictResolution.Ignore:
+                this._originalMarkdown = null;
                 this._htmlContent = Markdown.renderMarkdown(this._markdownContent);
+                this._mode = Mode.Markdown;
                 this._state = State.Editor;
+
+                this._fireSave();
                 break;
         }
 
@@ -168,11 +188,12 @@ export class MainStore extends Store {
         this._htmlContent = Markdown.renderMarkdown(this._markdownContent);
         this._mode = Mode.Markdown;
 
+        this._fireSave();
         this._fire();
     }
 
     private _onToggleState() {
-        if (this._mode === Mode.Markdown) {
+        if (this._mode === Mode.Markdown || this._state === State.Editor) {
             // Normal toggle
             this._state = this._state === State.Editor ? State.Preview : State.Editor;
         } else {

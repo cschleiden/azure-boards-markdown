@@ -1,3 +1,5 @@
+import * as $ from "jquery";
+
 import * as toMarkdown from "to-markdown";
 import * as marked from "marked";
 

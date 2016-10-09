@@ -34,6 +34,8 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         this._textarea = el;
     }
 
+    private _lastHeight: number;
+
     constructor(props: IEditorProps) {
         super(props);
 
@@ -90,26 +92,8 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         let tokens: string[] = [];
         for (let file of files) {
             this.props.actionsCreator.upload(file.name, file.path, file);
-
-            /*.then(url => {
-                this._addTextAtCursor("\n" + getImageToken(file.name, url) + "\n");
-            });*/
         }
     }
-    /*
-        private _addTextAtCursor(text: string) {
-            let idx = this._textarea.selectionStart;
-    
-            let val = this.state.value;
-            let v2 = val.substr(0, idx) + text + val.substr(idx);
-    
-            this.setState({
-                value: v2
-            }, () => {
-                // Restore cursor position
-                this._textarea.setSelectionRange(idx, idx);
-            });
-        }*/
 
     private _onSizeChange(force?: boolean) {
         if (force || this.props.sizeMode === SizeMode.AutoGrow) {
@@ -121,7 +105,11 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
                 const scrollHeight = this._textarea.scrollHeight + heightAdjustmentInPx;
                 this._textarea.style.height = oldHeight;
 
-                this.props.actionsCreator.resize(scrollHeight);
+                if (!this._lastHeight || this._lastHeight !== scrollHeight) {
+                    // Fire action if something changed
+                    this.props.actionsCreator.resize(scrollHeight);
+                    this._lastHeight = scrollHeight;
+                }
             }
         }
     }
@@ -129,16 +117,30 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
     private _onChange = (event) => {
         this.props.actionsCreator.setMarkdownContent(event.target.value);
 
+        this._fireSelection();
+
         this._onSizeChange();
     };
 
-    private _onSelect = (event: React.SyntheticEvent) => {
+    private _fireSelection() {
+        const selectionStart = this._textarea.selectionStart;
+        const selectionEnd = this._textarea.selectionEnd;
+
         if (this._textarea) {
-            this.props.actionsCreator.changeSelection(this._textarea.selectionStart, this._textarea.selectionEnd);
+            if (this.props.selection[0] !== selectionStart || this.props.selection[1] !== selectionEnd) {
+                this.props.actionsCreator.changeSelection(selectionStart, selectionEnd);
+            }
         }
     }
 
-    private _onPaste = () => {
+    private _onSelect = (event: React.SyntheticEvent) => {
+        this._fireSelection();
+    }
 
+    private _onPaste = () => {
+        if (this._textarea) {
+            // Change seletion to be single char
+            this.props.actionsCreator.changeSelection(this._textarea.selectionEnd, this._textarea.selectionEnd);
+        }
     }
 }

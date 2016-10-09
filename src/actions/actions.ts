@@ -11,11 +11,15 @@ let executing = false;
 export class Action<TPayload> {
     private _handlers: IActionHandler<TPayload>[] = [];
 
+    constructor(private _name: string) { }
+
     public addListener(handler: IActionHandler<TPayload>) {
         this._handlers.push(handler);
     }
 
     public invoke(payload: TPayload) {
+        console.log("Action " + this._name); 
+
         if (executing) {
             //debugger;
             //throw new Error("Cycle!");
@@ -37,22 +41,22 @@ export interface ISelectionChangePayload {
 }
 
 export class ActionsHub {
-    public reset = new Action<void>();
+    public reset = new Action<void>("reset");
 
     /** Value set by work item */
-    public setContentFromWorkItem = new Action<string>();
+    public setContentFromWorkItem = new Action<string>("setContentFromWorkItem");
 
-    public setMarkdownContent = new Action<string>();
+    public setMarkdownContent = new Action<string>("setMarkdownContent");
 
-    public resolveConflict = new Action<Model.ConflictResolution>();
+    public resolveConflict = new Action<Model.ConflictResolution>("resolveConflict");
 
-    public updateSize = new Action<number>();
+    public updateSize = new Action<number>("updateSize");
 
-    public toggleState = new Action<void>();
+    public toggleState = new Action<void>("toggleState");
 
-    public toggleSizeMode = new Action<void>();
+    public toggleSizeMode = new Action<void>("toggleSizeMode");
 
-    public resize = new Action<number>();
+    public resize = new Action<number>("resize");
 
-    public changeSelection = new Action<ISelectionChangePayload>();
+    public changeSelection = new Action<ISelectionChangePayload>("changeSelection");
 }

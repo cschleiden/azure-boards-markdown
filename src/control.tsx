@@ -15,7 +15,7 @@ import { throttle } from "./utils/throttle";
 import { MainComponent } from "./components/main"
 
 import { MainStore, IStoreListener } from "./store/store";
-import { ActionsHub } from "./actions/actions";
+import { ActionsHub, IActionHandler } from "./actions/actions";
 import { ActionsCreator } from "./actions/actionsCreators";
 
 export class Control implements ExtensionContracts.IWorkItemNotificationListener, IWorkItemControlAdapter {
@@ -34,23 +34,40 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
         const maxHeight = Number(config.witInputs["fullHeight"]) || 500;
 
         const actionsHub = new ActionsHub();
-        this._store = new MainStore(actionsHub, fieldName, minHeight, maxHeight);
-        this._store.addListener(throttle(200, this._onStoreChanged.bind(this)) as IStoreListener);
+        this._store = new MainStore(actionsHub, fieldName, minHeight, maxHeight, (output: string) => {
+            this._witService.setFieldValue(this._store.getFieldName(), output);
+            console.log("Saving - Saved");
+        });
+        //this._store.addListener(throttle(200, this._onStoreChanged.bind(this)) as IStoreListener);
 
         this._actionsCreator = new ActionsCreator(actionsHub, this._store, this);
+
+        //actionsHub.setMarkdownContent.addListener(throttle(200, this._onStoreChanged.bind(this)) as IActionHandler<string>);
     }
 
     private _lastSetValue: string;
+
+    private _lastOutput: string;
 
     private _onStoreChanged() {
         if (this._witService) {
             let newValue = this._store.getOutput();
 
-            if (!this._store.isChanged()) {
-                newValue = this._lastIncomingValue;
+            if (newValue === this._lastOutput) {
+                console.log("Saving - Discard, same as lastoutput");
+                return;
             }
+            this._lastOutput = newValue;
 
+
+            if (newValue === this._lastSetValue) {
+                console.log("Saving - Discard, same as lastSet");
+                return;
+            }
             this._lastSetValue = newValue;
+            
+            console.log("Saving - Saved");
+
             this._witService.setFieldValue(this._store.getFieldName(), newValue);
         }
     }
@@ -77,11 +94,23 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     }
 
     public onFieldChanged(fieldChangedArgs: ExtensionContracts.IWorkItemFieldChangedArgs) {
-        let changedValue = fieldChangedArgs.changedFields[this._store.getFieldName()];
-        if (changedValue && changedValue !== this._lastIncomingValue && changedValue !== this._lastSetValue) {
-            this._lastIncomingValue = changedValue;            
+        /*let changedValue = fieldChangedArgs.changedFields[this._store.getFieldName()];
+        if (changedValue) {
+            if (changedValue === this._lastIncomingValue) {
+                console.log("Incoming Change - Discarded, same as last incoming value");
+                return;
+            }
+
+            if (changedValue === this._lastSetValue) {
+                console.log("Incoming Change - Discarded, same as last set value");
+                return;
+            }
+
+            console.log("Incoming Change - Accepted");
+
+            this._lastIncomingValue = changedValue;
             this._changeField(changedValue);
-        }
+        }*/
     }
 
     /** Triggered when work item is saved */
@@ -107,6 +136,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     private _reset() {
         this._witService.getFieldValue(this._store.getFieldName()).then(value => {
             this._lastIncomingValue = value as string;
+            this._lastSetValue = value as string;
             this._changeField(value as string);
             this._actionsCreator.reset();
         });

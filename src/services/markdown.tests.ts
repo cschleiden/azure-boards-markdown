@@ -8,10 +8,10 @@ import { FormatAction } from "../model/model";
 describe("Utils", () => {
     describe("parse input", () => {
         it("should identify md content", () => {
-            let result = Markdown.extractMarkdown(`<p style="display:none;" id="md">md**test**</p>  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>`);
+            let result = Markdown.extractMarkdown(`<div style="display:none;" id="__md">md**test**</div><div class="rendered-markdown">asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div></div>`);
 
             expect(result.markdownContent).to.be.eq("md**test**");
-            expect(result.htmlContent).to.be.eq("  asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>");
+            expect(result.htmlContent).to.be.eq("asome&nbsp;<b>html&nbsp;</b>&nbsp;conest<div>asfdl long</div>");
         });
 
         it("should identify legacy", () => {

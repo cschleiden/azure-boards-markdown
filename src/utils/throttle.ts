@@ -1,11 +1,13 @@
-export function throttle(throttleMs: number, action: Function): Function {
+export function throttle(throttleMs: number, action: Function, leading: boolean = true): Function {
     let timeoutHandle: number = null;
     let trailingEdge = false;
 
     return () => {
         if (!timeoutHandle) {
-            // Execute on leading edge
-            action();
+            if (leading) {
+                // Execute on leading edge
+                action();
+            }
 
             timeoutHandle = window.setTimeout(() => {
                 if (trailingEdge) {

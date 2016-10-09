@@ -116,8 +116,8 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
 
     private _onKeyDown = (event: React.KeyboardEvent) => {
         if (event.ctrlKey) {
-
             let handled = false;
+
             switch (event.key.toLowerCase()) {
                 case "b":
                     this.props.actionsCreator.applyFormatting(FormatAction.Bold);
@@ -137,8 +137,8 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
                 case "v":
                     if (event.shiftKey) {
                         this.props.actionsCreator.toggleState();
+                        handled = true;
                     }
-                    handled = true;
                     break;
             }
 
