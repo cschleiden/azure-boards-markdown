@@ -4,12 +4,26 @@ import * as toMarkdown from "to-markdown";
 import * as marked from "marked";
 
 import { FormatAction } from "../model/model";
+import { ImageSizeCache } from "../services/imageSizeCache";
 
 export const sharedStyles = require("raw!../assets/vsts-style.style");
 
 const __md = "__md";
 const __mdStyle = "__mdStyle";
 const __mdBlock = "__mdBlock";
+
+var defaultRenderer = new marked.Renderer();
+var renderer: MarkedRenderer = new marked.Renderer();
+renderer.image = (href: string, title: string, text: string): string => {
+    let img = defaultRenderer.image(href, title, text);
+
+    const height = ImageSizeCache.getInstance().get(href);
+    if (height) {
+        img = img.substr(0, img.length - 1) + ` height="${height}" >`;
+    }
+
+    return img;
+};
 
 export namespace Markdown {
     function unescape(html: string): string {
@@ -19,7 +33,9 @@ export namespace Markdown {
     }
 
     export function renderMarkdown(input: string): string {
-        return unescape(marked(input, {}));
+        return unescape(marked(input, {
+            renderer: renderer
+        }));
     }
 
     export function convertToMarkdown(value: string): string {

@@ -9,6 +9,8 @@ import { sharedStyles } from "../services/markdown";
 import { ActionsCreator } from "../actions/actionsCreators";
 import { SizeMode } from "../model/model";
 
+import { ImageSizeCache } from "../services/imageSizeCache";
+
 const inlineStyles = require("raw!../assets/vsts-richtext.style");
 
 export interface IPreviewProps {
@@ -39,20 +41,36 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
             let finishedCount = 0;
 
             let $images = $(this._contentElement).find("img");
-            let delayedImages = $images.toArray().filter((img: HTMLImageElement) => !img.complete);
+            let delayedImages = $images.toArray().filter((img: HTMLImageElement) => !img.complete && !img.height);
             let delayedCount = delayedImages.length;
 
             if (delayedCount > 0) {
                 delayedImages.forEach((img) => {
                     $(img).on("load", () => {
-                        $(img).off("load");
+                        $(img)
+                            .off("load")
+                            .attr("height", img.height);
+                            
                         if (++finishedCount === delayedCount) {
                             this._sizeChange();
                         }
                     });
                 });
             } else {
+                this._setImgAttributes();
                 this._sizeChange();
+            }
+        }
+    }
+
+    private _setImgAttributes() {
+        if (this._contentElement) {
+            let $images = $(this._contentElement).find("img");
+            for (let image of $images.toArray() as HTMLImageElement[]) {
+                // Add attribute
+                $(image).attr("height", image.height);
+
+                ImageSizeCache.getInstance().store(image.src, image.height);
             }
         }
     }
