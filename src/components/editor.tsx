@@ -39,18 +39,9 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
     }
 
     public render(): JSX.Element {
-        let textAreaStyle: React.CSSProperties = {};
-
-        /*if (this.props.canGrow) {
-            textAreaStyle.height = `calc(100% - ${heightAdjustmentInPx}px)`;
-        } else {
-            textAreaStyle.height = "100%";
-        }*/
-
         return <div className="editor">
             <Dropzone onDrop={this._onDrop} disableClick={true} disablePreview={true} style={{}}>
                 <textarea
-                    style={textAreaStyle}
                     value={this.props.markdownContent}
                     onChange={this._onChange}
                     onSelect={this._onSelect}
