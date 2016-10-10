@@ -18,8 +18,14 @@ export class Uploads {
         fileName: string
     }> {
         return this._client.createAttachment(content, name).then(attachmentReference => {
+            const matches = attachmentReference.url.match(/wit\/attachments\/(.*)\?fileName=(.*)/);
+            const guid = matches[1];
+
+            const webContext = VSS.getWebContext();
+            const witUrl = `${webContext.account.uri}workitemtracking/v1.0/attachfilehandler.ashx?filenameguid=${guid}&filename=${name}`;
+
             return {
-                url: attachmentReference.url,
+                url: witUrl,
                 fileName: name
             };
         });

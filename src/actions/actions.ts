@@ -65,5 +65,7 @@ export class ActionsHub {
     public changeSelection = new Action<ISelectionChangePayload>("changeSelection");
 
     /** Insert token at current editor position */
-    public insertToken = new Action<string>("insertToken");    
+    public insertToken = new Action<string>("insertToken");   
+
+    public openFullscreen = new Action<string>("openFullscreen"); 
 }

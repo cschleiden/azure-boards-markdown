@@ -7,6 +7,7 @@ import * as ReactDOM from "react-dom";
 
 import * as VSSService from "VSS/Service";
 import * as WitService from "TFS/WorkItemTracking/Services";
+import * as WitContracts from "TFS/WorkItemTracking/Contracts";
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
 import { IWorkItemControlAdapter } from "./adapter";
@@ -28,7 +29,9 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
     private _actionsCreator: ActionsCreator;
 
     constructor() {
-        const config = VSS.getConfiguration();        
+        this._loadSettings();
+
+        const config = VSS.getConfiguration();
 
         const fieldName = config.witInputs["FieldName"];
         const minHeight = Number(config.witInputs["height"]) || config.defaultHeight;
@@ -44,7 +47,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
         this._actionsCreator = new ActionsCreator(actionsHub, this._store, this, new Uploads());
 
-        this._loadSettings();
+        actionsHub.openFullscreen.addListener(this._openFullscreen.bind(this));
     }
 
     private _loadSettings() {
@@ -63,7 +66,7 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
     private _storeSettings() {
         this._dataService.setValue("SizeMode", SizeMode[this._store.getSizeMode()], {
-            scopeType: "User"            
+            scopeType: "User"
         })
     }
 
@@ -146,5 +149,30 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
                 this._witService.beginSaveWorkItem(() => resolve(null), () => reject(null));
             });
         }
+    }
+
+    private _openFullscreen(htmlContent: string) {
+        const context = VSS.getExtensionContext();
+
+        Q.all([
+            this._witService.getFields(), VSS.getService(VSS.ServiceIds.Dialog)])
+            .spread((fields: WitContracts.WorkItemField[], dialogService: IHostDialogService) => {
+                let matchingFields = fields.filter(f => f.referenceName === this._store.getFieldName());
+
+                dialogService.openDialog(
+                    `${context.publisherId}.${context.extensionId}.fullscreenView`,
+                    {
+                        modal: true,
+                        width: 30000,
+                        height: 30000,
+                        buttons: [],
+                        title: matchingFields && matchingFields.length > 0 && matchingFields[0].name || "",
+                        draggable: false,
+                        resizable: false
+                    },
+                    {
+                        "htmlContent": htmlContent
+                    });
+            });
     }
 }

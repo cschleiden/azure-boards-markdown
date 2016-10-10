@@ -97,4 +97,8 @@ export class ActionsCreator {
             });
         }
     }
+
+    public openFullscreen() {
+        this._actionsHub.openFullscreen.invoke(this._store.getHtmlContent());
+    }
 }

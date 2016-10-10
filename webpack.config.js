@@ -5,7 +5,8 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     target: "web",
     entry: {
-        registration: "./src/app.ts"
+        "registration": "./src/app.ts",
+        "dialog": "./src/dialog.tsx"
     },
     output: {
         filename: "src/[name].js",
@@ -49,6 +50,17 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': JSON.stringify('production')
+            }
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {            
+                warnings: true
+            },
+            sourceMap: false
+        }),
         new CopyWebpackPlugin([
             { from: "./node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js", to: "libs/VSS.SDK.min.js" },
             { from: "./src/*.html", to: "./" },

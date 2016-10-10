@@ -41,16 +41,23 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
             let finishedCount = 0;
 
             let $images = $(this._contentElement).find("img");
-            let delayedImages = $images.toArray().filter((img: HTMLImageElement) => !img.complete && !img.height);
-            let delayedCount = delayedImages.length;
+            $images.each((idx, image: HTMLImageElement) => {
+                image.onclick = () => {
+                    window.open(image.src);
+                }
+            });
 
+            let delayedImages = $images.toArray().filter((img: HTMLImageElement) => !img.complete && !img.height);
+            const delayedCount = delayedImages.length;
             if (delayedCount > 0) {
                 delayedImages.forEach((img) => {
                     $(img).on("load", () => {
                         $(img)
                             .off("load")
                             .attr("height", img.height);
-                            
+
+                        ImageSizeCache.getInstance().store(img.src, img.height);
+
                         if (++finishedCount === delayedCount) {
                             this._sizeChange();
                         }
@@ -67,7 +74,6 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
         if (this._contentElement) {
             let $images = $(this._contentElement).find("img");
             for (let image of $images.toArray() as HTMLImageElement[]) {
-                // Add attribute
                 $(image).attr("height", image.height);
 
                 ImageSizeCache.getInstance().store(image.src, image.height);

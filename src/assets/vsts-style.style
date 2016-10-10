@@ -1,13 +1,5 @@
-.rendered-markdown body, .rendered-markdown html {
-font-family:"-apple-system",BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Ubuntu,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-height:100%;
-font-size:13px;
-line-height:20px;
-}
-
-.rendered-markdown body {
-position:relative;
-padding-top:50px;
+.rendered-markdown img {
+cursor:pointer;
 }
 
 .rendered-markdown h1, .rendered-markdown h2, .rendered-markdown h3, .rendered-markdown h4, .rendered-markdown h5, .rendered-markdown h6 {

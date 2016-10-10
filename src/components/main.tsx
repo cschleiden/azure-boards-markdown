@@ -105,6 +105,7 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
             toolbar = <div className="toolbar">
                 {editorToolbar}
 
+                <span className="right bowtie-icon bowtie-view-full-screen" title="Open full screen" onClick={this._openFullscreen}></span>
                 <span className={"right bowtie-icon " + (this.state.sizeMode === SizeMode.AutoGrow ? "bowtie-fold-less" : "bowtie-fold-more")} title={this.state.sizeMode === SizeMode.AutoGrow ? "Disable auto size" : "Enable auto size"} onClick={this._toggleAutoGrow}></span>
                 <span className={"right bowtie-icon " + (this.state.state === State.Preview ? "bowtie-edit-outline" : "bowtie-file-preview")} title={(this.state.state === State.Preview ? "Preview [Ctrl + Shift + V]" : "Edit")} onClick={this._toggleEditMode}></span>
             </div>;
@@ -183,5 +184,9 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
         if (this._editor) {
             this._editor.openFileSelector();
         }
+    }
+
+    private _openFullscreen = () => {
+        this.props.actionsCreator.openFullscreen();
     }
 }
