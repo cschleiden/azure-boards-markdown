@@ -121,7 +121,7 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
                 const scrollHeight = this._textarea.scrollHeight + heightAdjustmentInPx;
                 this._textarea.style.height = oldHeight;
 
-                if (!this._lastHeight || this._lastHeight !== scrollHeight) {
+                if (force || !this._lastHeight || this._lastHeight !== scrollHeight) {
                     // Fire action if something changed
                     this.props.actionsCreator.resize(scrollHeight);
                     this._lastHeight = scrollHeight;

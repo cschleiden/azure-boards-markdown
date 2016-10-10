@@ -161,14 +161,14 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
 
                 dialogService.openDialog(
                     `${context.publisherId}.${context.extensionId}.fullscreenView`,
-                    {
+                    {      
                         modal: true,
                         width: 30000,
                         height: 30000,
                         buttons: [],
                         title: matchingFields && matchingFields.length > 0 && matchingFields[0].name || "",
                         draggable: false,
-                        resizable: false
+                        resizable: true                        
                     },
                     {
                         "htmlContent": htmlContent
