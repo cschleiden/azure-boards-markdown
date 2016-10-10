@@ -1,32 +1,34 @@
-# Update - 6/21/2016 #
+# Markdown
 
-After the latest VSTS updates the extension should work for everyone. If not, please drop me an email, or create an issue on github.
+**-- This extension is in preview, please report any issues/suggestions at https://github.com/cschleiden/vsts-markdown --** 
 
-# Easy decomposition of work items #
+_Markdown_ allows you to replace the HTML field controls on your work item forms with a customized, Markdown enabled 
 
-**Decompose** allows you to quickly break down work items into sub-hierarchies. 
+## 
 
-- Create hierarchies of work items without waiting
-- Should it be a Task or is it big enough for a Story? Promote/Demote work items easily between different hierarchy levels
-- Full support for keyboard shortcuts. Just like your favorite editor (VS Code), you never have to leave the keyboard
-- Iterate on titles before commiting
+**Markdown** is a custom work item form control 
 
-![Overview](marketplace/overview.png)
-
-## Example: Starting a Sprint ##
-When you start to work on a feature and you want to quickly break it down into User Stories and Tasks you can use Excel, manually create work items, or the *New Item* panel on the Backlog. This all works, but isn't as convenient as it could be. 
-
-With **Decompose** you can easily define hierarchies, change work items between levels, and finally create actual work items with a single click.   
+###
 
 ![Breaking down of an Epic](marketplace/quick-decompose.gif)
 
+### Drag'n'Drop image upload
+
+## FAQ
+
+### Q: When I start using _Markdown_ what happens to the existing HTML content in my work items?
+
+**A**: _Markdown_ displays existing HTML content just fine. For editing, it detects whether content has been edited using an older editor and allows to convert existing HTML input to markdown, or . 
+
+### Q: What happens with older clients when using _Markdown_?
+
+**A**: _Markdown_ stores the original markdown input plus rendered HTML in the actual work item field. It's difficult to 
+
+### Q: 
+
 # Version History #
 
-* **0.0.5** - Fixes a bug that prevented Internet Explorer users from saving
-
-# On Premise/Team Foundation Server #
-
-Many people have asked why this extension is only available for Team Services: it relies on APIs that will only be available in the next **major** version of Team Foundation Server. After release, I will provide a package of this extension that can be installed on an on premise Team Foundation Server, until then I can only support Team Services.
+* **0.3.0** - First preview release
 
 # Code #
-The code is available at https://github.com/cschleiden/vsts-quick-decompose.
+As always, the code is available at https://github.com/cschleiden/vsts-markdown.
