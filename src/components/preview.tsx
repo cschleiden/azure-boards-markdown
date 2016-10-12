@@ -41,13 +41,23 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
             let finishedCount = 0;
 
             let $images = $(this._contentElement).find("img");
+
+            // Attach handler for open, and ensure that "height" attribute is set, if height is already known
             $images.each((idx, image: HTMLImageElement) => {
                 image.onclick = () => {
                     window.open(image.src);
                 }
+
+                if (image.height) {                    
+                    $(image).attr("height", image.height);
+                    ImageSizeCache.getInstance().store(image.src, image.height);
+                }
             });
 
-            let delayedImages = $images.toArray().filter((img: HTMLImageElement) => !img.complete && !img.height);
+            // Attach event handlers for images where 
+            // - height is not known
+            // - loading has not been completed
+            let delayedImages = $images.toArray().filter((img: HTMLImageElement) => !img.complete && !$(img).attr("height"));
             const delayedCount = delayedImages.length;
             if (delayedCount > 0) {
                 delayedImages.forEach((img) => {
@@ -64,19 +74,7 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
                     });
                 });
             } else {
-                this._setImgAttributes();
                 this._sizeChange();
-            }
-        }
-    }
-
-    private _setImgAttributes() {
-        if (this._contentElement) {
-            let $images = $(this._contentElement).find("img");
-            for (let image of $images.toArray() as HTMLImageElement[]) {
-                $(image).attr("height", image.height);
-
-                ImageSizeCache.getInstance().store(image.src, image.height);
             }
         }
     }

@@ -1,12 +1,12 @@
 {
     "manifestVersion": 1,
-    "version": "0.2.3",
+    "version": "0.3.0",
     "name": "Markdown",
     "scopes": [
         "vso.work",
         "vso.work_write"
     ],
-    "description": "Quickly decompose work item into sub-hierarchies",
+    "description": "Markdown editor for the work item form",
     "publisher": "cschleiden",
     "id": "markdown",
     "icons": {
@@ -18,8 +18,7 @@
         }
     ],
     "tags": [
-        "Work Items",
-        "Decompose"
+        "work items", "markdown", "editor", "custom control"    
     ],
     "content": {
         "details": {
@@ -67,23 +66,13 @@
                         }
                     },
                     {
-                        "id": "BlockLegacy",
-                        "name": "Block legacy HTML controls from editing",
-                        "description": "Block legacy editing",
-                        "mode": "combo",
-                        "validation": {
-                            "dataType": "Boolean",
-                            "mode": "combo",
-                            "isRequired": true
-                        }
-                    },
-                    {
                         "id": "height",
                         "name": "Initial height",
                         "description": "Height of the control on the form (default 150px)",
                         "validation": {
                             "dataType": "Number",
-                            "isRequired": false
+                            "isRequired": false,
+                            "default": 150
                         }
                     },
                     {

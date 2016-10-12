@@ -16,6 +16,8 @@ export class ImageSizeCache {
     }
 
     public get(url: string): number {
-        return this._cache[url];
+        let decodedUrl = url.replace("&amp;", "&");
+
+        return this._cache[decodedUrl];
     }
 }

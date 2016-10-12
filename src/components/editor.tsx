@@ -118,8 +118,12 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
                 // to default
                 const oldHeight = this._textarea.style.height;
                 this._textarea.style.height = "auto";
+                // Hide vertical scrollbar, otherwise we might get different line-breaks than in the full view
+                this._textarea.style.overflow = "hidden";
                 const scrollHeight = this._textarea.scrollHeight + heightAdjustmentInPx;
                 this._textarea.style.height = oldHeight;
+                // Reset vertical scrolling behavior
+                this._textarea.style.overflow = "";
 
                 if (force || !this._lastHeight || this._lastHeight !== scrollHeight) {
                     // Fire action if something changed
