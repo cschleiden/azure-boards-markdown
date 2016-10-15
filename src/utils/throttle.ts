@@ -13,14 +13,14 @@ export function throttle(throttleMs: number, action: (...args: any[]) => void, l
         if (!timeoutHandle) {
             if (leading) {
                 // Execute on leading edge
-                action.call(null, lastArgs);
+                action(...lastArgs);
             } else {
                 trailingEdge = true;
             }
 
             timeoutHandle = window.setTimeout(() => {
                 if (trailingEdge) {
-                    action.call(null, lastArgs);
+                    action(...lastArgs);
                 }
 
                 timeoutHandle = null;
