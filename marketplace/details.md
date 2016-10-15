@@ -2,7 +2,7 @@
 
 **-- This extension is in early preview, please report any issues/suggestions at [https://github.com/cschleiden/vsts-markdown](https://github.com/cschleiden/vsts-markdown) or [cschleid@microsoft.com](mailto:cschleid@microsoft.com) --** 
 
-__Markdown__ is a cusom work item form control, that allows you to edit the rich text fields on your work items with a customized, Markdown enabled editor.
+__Markdown__ is a custom work item form control, that allows you to edit the rich text fields on your work items with a Markdown enabled editor.
 
 ## Features
 
@@ -34,22 +34,22 @@ Here are some quick steps to get you started on VSTS:
 
 ### Step 1 
 
-From an [inherited process](https://www.visualstudio.com/en-us/docs/work/process/manage-process#create-an-inherited-process), select the work item type you want to customize. Then, from the _Layout_ tab, add a custom control. For a _Feature_ is looks like this:
+From an [inherited process](https://www.visualstudio.com/en-us/docs/work/process/manage-process#create-an-inherited-process), select the work item type you want to customize. Then, from the _Layout_ tab, add a custom control. For a _Feature_ it looks like this:
 
 ![Add custom control](marketplace/install1.png)
 
 ### Step 2: Select __Markdown__ control
 
-Select the __Markdown__ control form the dropdown:
+Select the __Markdown__ control from the dropdown:
 
 ![Select Markdown control](marketplace/install2.png)
 
 ### Step 3: Configure __Markdown__ control
 
-From the _Options_ tab, select the backing Field. Here _Description_ was selected:
+From the _Options_ tab, select the backing field. For example, _Description_:
 
 ![Configure Markdown control](marketplace/install3.png)
-Optionally you can customize the minimum and maximum height.
+Optionally, you can customize the minimum and maximum  editor height.
 
 ### Step 4: Select _Markdown_ control
 
@@ -59,13 +59,11 @@ Place the control in a new group:
 ### Step 5: Hide existing group
 
 Since we don't want two editors on the work item form, hide the existing Description group:
-
 ![Add custom control](marketplace/install5.png)
 
 ### Step 6: Use the __Markdown__ control
 
-All done, since the layout is auto-saved just navigate to a an existing or new work item and the control will show up:
-
+All done, since the layout is auto-saved just navigate to an existing or a new work item and the control will show up:
 ![Use Markdown editor](marketplace/install6.png)
 
 ## FAQ
