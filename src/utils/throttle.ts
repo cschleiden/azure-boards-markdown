@@ -1,19 +1,26 @@
-export function throttle(throttleMs: number, action: Function, leading: boolean = true): Function {
+/**
+ * Throttles function invocation. 
+ * Note: Arguments passed to the last call will be used
+ */
+export function throttle(throttleMs: number, action: (...args: any[]) => void, leading: boolean = true): (...args: any[]) => void {
     let timeoutHandle: number = null;
     let trailingEdge = false;
+    let lastArgs: any[] = [];
 
-    return () => {
+    return (...args: any[]): void => {
+        lastArgs = args || [];
+
         if (!timeoutHandle) {
             if (leading) {
                 // Execute on leading edge
-                action();
+                action.call(null, lastArgs);
             } else {
                 trailingEdge = true;
             }
 
             timeoutHandle = window.setTimeout(() => {
                 if (trailingEdge) {
-                    action();
+                    action.call(null, lastArgs);
                 }
 
                 timeoutHandle = null;

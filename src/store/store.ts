@@ -3,8 +3,6 @@ import { ActionsHub, ISelectionChangePayload } from "../actions/actions";
 
 import { Markdown } from "../services/markdown";
 
-import { throttle } from "../utils/throttle";
-
 export interface IStoreListener {
     (): void;
 }
@@ -147,9 +145,9 @@ export class MainStore extends Store {
         this._actionsHub.insertToken.addListener(this._onInsertToken.bind(this));
     }
 
-    private _fireSave = throttle(500, () => {
+    private _fireSave = () => {
         this._triggerSave(this.getOutput());
-    }, false);
+    };
 
     /** Indicate that settings have changed */
     private _fireSettings() {

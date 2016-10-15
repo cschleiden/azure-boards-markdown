@@ -10,6 +10,8 @@ import * as WitService from "TFS/WorkItemTracking/Services";
 import * as WitContracts from "TFS/WorkItemTracking/Contracts";
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
+import { throttle } from "utils/throttle";
+
 import { IWorkItemControlAdapter } from "./adapter";
 
 import { MainComponent } from "./components/main"
@@ -37,11 +39,13 @@ export class Control implements ExtensionContracts.IWorkItemNotificationListener
         const minHeight = Number(config.witInputs["height"]) || config.defaultHeight;
         const maxHeight = Number(config.witInputs["fullHeight"]) || 500;
 
-        const actionsHub = new ActionsHub();
-        this._store = new MainStore(actionsHub, fieldName, minHeight, maxHeight, (output: string) => {
+        let throttledSave = throttle(500, (output: string) => {
             this._witService.setFieldValue(this._store.getFieldName(), output);
             console.log("Saving - Saved");
-        }, () => {
+        }, false);
+
+        const actionsHub = new ActionsHub();
+        this._store = new MainStore(actionsHub, fieldName, minHeight, maxHeight, throttledSave, () => {
             this._storeSettings();
         });
 
