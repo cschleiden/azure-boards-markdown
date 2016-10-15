@@ -54,13 +54,7 @@ module.exports = {
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
             }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {            
-                warnings: true
-            },
-            sourceMap: false
-        }),
+        }),        
         new CopyWebpackPlugin([
             { from: "./node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js", to: "libs/VSS.SDK.min.js" },
             { from: "./src/*.html", to: "./" },
