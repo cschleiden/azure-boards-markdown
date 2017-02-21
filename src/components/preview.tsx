@@ -27,6 +27,7 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
     public render(): JSX.Element {
         return <div className="preview">
             <Frame head={<style type="text/css">{inlineStyles + sharedStyles}</style>} contentDidMount={this._contentDidMount} contentDidUpdate={this._contentDidMount}>
+                <base target="_blank" />
                 <div className="rendered-markdown" dangerouslySetInnerHTML={{ __html: this.props.htmlContent }} ref={this._resolveContent} />
             </Frame>
         </div>;
@@ -48,7 +49,7 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
                     window.open(image.src);
                 }
 
-                if (image.height) {                    
+                if (image.height) {
                     $(image).attr("height", image.height);
                     ImageSizeCache.getInstance().store(image.src, image.height);
                 }
