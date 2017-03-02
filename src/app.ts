@@ -1,5 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
 import { Control } from "./control";

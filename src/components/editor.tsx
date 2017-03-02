@@ -29,8 +29,8 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         this._textarea = el;
     }
 
-    private _dropZone: ReactDropzone.Dropzone;
-    private _resolveDropZone = (dropZone: ReactDropzone.Dropzone) => {
+    private _dropZone: any;
+    private _resolveDropZone = (dropZone: any) => {
         this._dropZone = dropZone;
     }
 
@@ -155,7 +155,7 @@ export class EditorComponent extends React.Component<IEditorProps, IEditorState>
         }
     }
 
-    private _onSelect = (event: React.SyntheticEvent) => {
+    private _onSelect = () => {
         this._fireSelection();
     }
 

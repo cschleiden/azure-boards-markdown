@@ -46,6 +46,10 @@ module.exports = {
             {
                 test: /\.s?css$/,
                 loaders: ["style", "css", "sass"]
+            },
+            {
+                test: /\.json$/,
+                loader: 'json-loader'
             }
         ]
     },
@@ -54,10 +58,11 @@ module.exports = {
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
             }
-        }),        
+        }),
         new CopyWebpackPlugin([
             { from: "./node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js", to: "libs/VSS.SDK.min.js" },
             { from: "./src/*.html", to: "./" },
+            { from: "./node_modules/highlight.js/styles/default.css", to: "./" },
             { from: "./marketplace", to: "marketplace" },
             { from: "./vss-extension.json", to: "vss-extension-release.json" }
         ])

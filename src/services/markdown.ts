@@ -1,7 +1,8 @@
 import * as $ from "jquery";
 
 import * as toMarkdown from "to-markdown";
-import * as marked from "marked";
+import * as MarkdownIt from "markdown-it";
+import * as hljs from "highlight.js";
 
 import { FormatAction } from "../model/model";
 import { ImageSizeCache } from "../services/imageSizeCache";
@@ -12,17 +13,38 @@ const __md = "__md";
 const __mdStyle = "__mdStyle";
 const __mdBlock = "__mdBlock";
 
-var defaultRenderer = new marked.Renderer();
-var renderer: MarkedRenderer = new marked.Renderer();
-renderer.image = (href: string, title: string, text: string): string => {
-    let img = defaultRenderer.image(href, title, text);
+var md = new MarkdownIt({
+    linkify: true,
 
-    const height = ImageSizeCache.getInstance().get(href);
+    highlight: function (str, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+            try {
+                return hljs.highlight(lang, str).value;
+            } catch (__) {
+                // Ignore 
+            }
+        }
+
+        return ''; // use external default escaping
+    }
+});
+
+
+// Customize image rendering
+var defaultRender = md.renderer.rules.image;
+
+md.renderer.rules.image = function (tokens, idx, options, env, self) {
+    const token = tokens[idx];
+    const aIndex = token.attrIndex('src');
+    const src = token.attrs[aIndex][1];
+
+    const height = ImageSizeCache.getInstance().get(src);
     if (height) {
-        img = img.substr(0, img.length - 1) + ` height="${height}">`;
+        return `<img src="${src}" height="${height}" />`;
     }
 
-    return img;
+    // pass token to default renderer.
+    return defaultRender(tokens, idx, options, env, self);
 };
 
 export namespace Markdown {
@@ -33,9 +55,7 @@ export namespace Markdown {
     }
 
     export function renderMarkdown(input: string): string {
-        return unescape(marked(input, {
-            renderer: renderer
-        }));
+        return unescape(md.render(input));
     }
 
     export function convertToMarkdown(value: string): string {

@@ -118,7 +118,7 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
 
         return <div>
             {toolbar}
-            <div className="md" onKeyDown={this._onKeyDown} tabindex="0">
+            <div className="md" onKeyDown={this._onKeyDown} tabIndex={0}>
                 {content}
             </div>
             {progress}
@@ -129,7 +129,7 @@ export class MainComponent extends React.Component<IMainProps, IMainState> {
         this.props.actionsCreator.applyFormatting(formatAction);
     };
 
-    private _onKeyDown = (event: React.KeyboardEvent) => {
+    private _onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.ctrlKey) {
             let handled = false;
 

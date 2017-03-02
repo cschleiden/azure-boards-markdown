@@ -1,4 +1,4 @@
-/// <reference path="../../typings/index.d.ts" />
+///<reference types="vss-web-extension-sdk" />
 
 import * as VSSService from "VSS/Service";
 import * as WitClient from "TFS/WorkItemTracking/RestClient";
@@ -7,7 +7,7 @@ import * as WitService from "TFS/WorkItemTracking/Services";
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
 export class Uploads {
-    private _client: WitClient.WorkItemTrackingHttpClient2_3;
+    private _client: WitClient.WorkItemTrackingHttpClient3_2;
 
     constructor() {
         this._client = WitClient.getClient();

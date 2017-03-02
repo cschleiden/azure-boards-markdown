@@ -12,6 +12,7 @@ import { SizeMode } from "../model/model";
 import { ImageSizeCache } from "../services/imageSizeCache";
 
 const inlineStyles = require("raw!../assets/vsts-richtext.style");
+const highlightStyles = require("raw!../assets/highlight.js.style");
 
 export interface IPreviewProps {
     actionsCreator: ActionsCreator;
@@ -26,7 +27,7 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
 
     public render(): JSX.Element {
         return <div className="preview">
-            <Frame head={<style type="text/css">{inlineStyles + sharedStyles}</style>} contentDidMount={this._contentDidMount} contentDidUpdate={this._contentDidMount}>
+            <Frame head={<style type="text/css">{inlineStyles + sharedStyles + highlightStyles}</style>} contentDidMount={this._contentDidMount} contentDidUpdate={this._contentDidMount}>                
                 <base target="_blank" />
                 <div className="rendered-markdown" dangerouslySetInnerHTML={{ __html: this.props.htmlContent }} ref={this._resolveContent} />
             </Frame>
@@ -58,7 +59,7 @@ export class PreviewComponent extends React.Component<IPreviewProps, void> {
             // Attach event handlers for images where 
             // - height is not known
             // - loading has not been completed
-            let delayedImages = $images.toArray().filter((img: HTMLImageElement) => !img.complete && !$(img).attr("height"));
+            let delayedImages: HTMLImageElement[] = $images.toArray().filter((img: HTMLImageElement) => !img.complete && !$(img).attr("height")) as HTMLImageElement[];
             const delayedCount = delayedImages.length;
             if (delayedCount > 0) {
                 delayedImages.forEach((img) => {

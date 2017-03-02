@@ -1,3 +1,5 @@
+///<reference types="chai" />
+
 import { expect } from "chai";
 
 import * as $ from "jquery";

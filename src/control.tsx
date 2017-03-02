@@ -1,5 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-
 import * as Q from "q";
 
 import * as React from "react";
@@ -10,7 +8,7 @@ import * as WitService from "TFS/WorkItemTracking/Services";
 import * as WitContracts from "TFS/WorkItemTracking/Contracts";
 import * as ExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 
-import { throttle } from "utils/throttle";
+import { throttle } from "./utils/throttle";
 
 import { IWorkItemControlAdapter } from "./adapter";
 

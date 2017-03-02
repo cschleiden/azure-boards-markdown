@@ -15,9 +15,22 @@
   "author": "Christopher Schleiden",
   "license": "MIT",
   "devDependencies": {
+    "@types/chai": "^3.4.35",
+    "@types/highlight.js": "^9.1.9",
+    "@types/jquery": "^2.0.40",
+    "@types/knockout": "^3.4.39",
+    "@types/markdown-it": "0.0.2",
+    "@types/mocha": "^2.2.39",
+    "@types/q": "0.0.32",
+    "@types/react": "0.14.57",
+    "@types/react-dom": "^0.14.23",
+    "@types/react-dropzone": "0.0.32",
+    "@types/react-spinkit": "^1.1.30",
+    "@types/requirejs": "^2.1.28",
     "chai": "^3.5.0",
     "copy-webpack-plugin": "^3.0.0",
     "css-loader": "^0.23.1",
+    "json-loader": "^0.5.4",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
     "karma-mocha": "^1.0.1",
@@ -38,17 +51,18 @@
     "style-loader": "^0.13.1",
     "tfx-cli": "^0.3.30",
     "ts-loader": "^0.8.2",
-    "typescript": "^2.0.3",
+    "typescript": "^2.2.1",
     "typings": "^1.4.0",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "highlight.js": "^9.9.0",
     "jquery": "^3.1.1",
-    "marked": "^0.3.6",
+    "markdown-it": "^8.3.0",
     "react-dropzone": "^3.6.0",
     "react-frame-component": "^0.6.6",
     "to-markdown": "^3.0.1",
-    "vss-web-extension-sdk": "^1.105.0"
+    "vss-web-extension-sdk": "^2.113.0"
   }
 }

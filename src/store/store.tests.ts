@@ -1,3 +1,7 @@
+///<reference types="chai" />
+///<reference types="jquery" />
+///<reference types="mocha" />
+
 import { expect } from "chai";
 
 import * as $ from "jquery";
