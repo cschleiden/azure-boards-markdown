@@ -133,11 +133,21 @@ ${sharedStyles}
 </style><div class=rendered-markdown>${htmlContent}</div>`;
     }
 
+    /**
+     * @returns true if elements don't match 
+     */
     export function compare(markdownContent: string, inputHtmlContent: string): boolean {
-        const generatedMarkdownContenxt = Markdown.renderMarkdown(markdownContent);
+        const generatedMarkdownContent = Markdown.renderMarkdown(markdownContent);
         const trimmedHtmlContent = inputHtmlContent.trim();
 
-        return (trimmedHtmlContent !== "" && trimmedHtmlContent !== generatedMarkdownContenxt.trim());
+        if (trimmedHtmlContent !== "" && trimmedHtmlContent !== generatedMarkdownContent.trim()) {
+            // html and markdown content don't match
+            const convertedMarkdown = convertToMarkdown(inputHtmlContent);
+
+            return markdownContent !== convertedMarkdown;
+        }
+
+        return false;
     }
 
     export function applyFormatting(selectionStart: number, selectionEnd: number, formatAction: FormatAction, markdownContent: string): string {

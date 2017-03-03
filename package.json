@@ -1,9 +1,11 @@
 {
   "description": "",
   "main": "webpack.config.js",
+  "name": "vsts-markdown",
+  "version": "1.0.0",
   "scripts": {
     "clean": "rimraf dist *.vsix",
-    "dev": "webpack-dev-server --hot --progress --colors --content-base ./src --https",
+    "dev": "webpack-dev-server --hot --progress --colors --content-base ./src --https --port 9085",
     "package:dev": "node ./scripts/packageDev",
     "publish:dev": "npm run package:dev && node ./scripts/publishDev",
     "build:release": "npm run clean && mkdir dist && webpack --progress --colors --output-path ./dist -p",

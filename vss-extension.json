@@ -1,6 +1,6 @@
 {
     "manifestVersion": 1,
-    "version": "0.3.3",
+    "version": "0.4.0",
     "name": "Markdown",
     "scopes": [
         "vso.work",
@@ -18,7 +18,7 @@
         }
     ],
     "tags": [
-        "work items", "markdown", "editor", "custom control"    
+        "work items", "markdown", "editor", "custom control"
     ],
     "content": {
         "details": {

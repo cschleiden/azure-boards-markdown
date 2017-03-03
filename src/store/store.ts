@@ -33,7 +33,7 @@ export class MainStore extends Store {
 
     private _fieldName: string;
     private _minHeight: number;
-    private _maxHeight: number;    
+    private _maxHeight: number;
 
     private _height: number;
     private _sizeMode: SizeMode = SizeMode.Default;
@@ -69,7 +69,7 @@ export class MainStore extends Store {
         this._subscribeToActions();
     }
 
-    protected _setupServices() {
+    protected _setupServices(): void {
     }
 
     public getFieldName(): string {
@@ -156,7 +156,12 @@ export class MainStore extends Store {
 
     private _onReset() {
         this._originalMarkdown = this._markdownContent;
+
         this._state = State.Preview;
+        if (this._markdownContent.trim() === "") {
+            // content is empty, e.g., new work item, force editor view
+            this._state = State.Editor;
+        }
 
         this._fire();
     }

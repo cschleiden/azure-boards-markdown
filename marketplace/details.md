@@ -80,6 +80,7 @@ All done, since the layout is auto-saved just navigate to an existing or a new w
 
 ## Version History
 
+* **0.4.0** - **BREAKING**: Switched the markdown renderer from `marked` to `markdown-it` to be in sync with VSTS and support syntax highlighting. You might see the _Conflict_ message when editing existing markdown fields. Just hit `[Ignore]` and save again, you should not lose any information.
 * **0.3.0** - First preview release
 
 ## Planned Features
