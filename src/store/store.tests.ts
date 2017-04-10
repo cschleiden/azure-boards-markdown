@@ -4,8 +4,6 @@
 
 import { expect } from "chai";
 
-import * as $ from "jquery";
-
 import * as Actions from "../actions/actions";
 import * as Model from "../model/model";
 import { MainStore } from "./store";
@@ -23,7 +21,7 @@ describe("StoreTests", () => {
         store = new MainStore(actionsHub, "System.Field", 150, 500, (output: string) => {
             ++saveCalled;
         }, () => {
-            // Settings
+            // settings
         });
 
         fireCalled = 0;
@@ -63,15 +61,15 @@ describe("StoreTests", () => {
         expect(saveCalled).to.be.eq(1);
     });
 
-    it("Switches to preview after save", () => {
-        // Arrange
-        actionsHub.toggleState.invoke(null)
+    it("Switches to edit view for empty content", () => {
+        // arrange
+        actionsHub.toggleState.invoke(null);
 
-        // Act
+        // act
         actionsHub.reset.invoke(null);
 
-        // Assert
-        expect(store.getState()).to.be.eq(Model.State.Preview);
+        // assert
+        expect(store.getState()).to.be.eq(Model.State.Editor);
         expect(fireCalled).to.be.eq(2);
     });
-})
+});

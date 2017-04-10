@@ -157,8 +157,11 @@ export class MainStore extends Store {
     private _onReset() {
         this._originalMarkdown = this._markdownContent;
 
+        const markdownEmpty = !this._markdownContent || this._markdownContent.trim() === "";
+        const htmlEmpty = !this._htmlContent || this._htmlContent.trim() === "";
+
         this._state = State.Preview;
-        if (this._markdownContent.trim() === "") {
+        if (markdownEmpty && htmlEmpty) {
             // content is empty, e.g., new work item, force editor view
             this._state = State.Editor;
         }

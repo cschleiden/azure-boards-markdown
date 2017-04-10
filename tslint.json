@@ -1,0 +1,7 @@
+{
+    "rules": {
+        "typedef": [
+            "property-declaration", "member-variable-declaration"
+        ]
+    }
+}

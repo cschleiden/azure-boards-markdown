@@ -18,7 +18,7 @@ export class Action<TPayload> {
     }
 
     public invoke(payload: TPayload) {
-        console.log("Action " + this._name); 
+        // console.log("Action " + this._name);
 
         if (executing) {
             //debugger;
@@ -56,7 +56,7 @@ export class ActionsHub {
 
     public setSizeMode = new Action<Model.SizeMode>("setSizeMode");
     public toggleSizeMode = new Action<void>("toggleSizeMode");
-    
+
     public resize = new Action<number>("resize");
 
     public setProgress = new Action<boolean>("setProgress");
@@ -65,7 +65,7 @@ export class ActionsHub {
     public changeSelection = new Action<ISelectionChangePayload>("changeSelection");
 
     /** Insert token at current editor position */
-    public insertToken = new Action<string>("insertToken");   
+    public insertToken = new Action<string>("insertToken");
 
-    public openFullscreen = new Action<string>("openFullscreen"); 
+    public openFullscreen = new Action<string>("openFullscreen");
 }
